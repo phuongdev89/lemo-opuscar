@@ -71,6 +71,7 @@ All four page tools take `--size WxH` (default `1920x1080`, even numbers) and `-
 | Variable | Meaning |
 |---|---|
 | `LEMO_OPUSCAR_HOME` | where `setup.sh` keeps the library (default `~/lemo-opuscar`) |
+| `OUTPUT_DIR` | output folder for user films (default `films`; can also be set in `.env`) |
 | `PLAYWRIGHT_CHROME` | a Chrome / headless-shell executable instead of Playwright's |
 | `LEMO_ANGLE` | WebGL backend (default `metal` on macOS; `default` passes none) |
 | `RENDER_SLOTS` | optional; limits concurrent full renders across processes |

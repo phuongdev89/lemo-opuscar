@@ -2,6 +2,7 @@ node_modules/
 .venv/
 __pycache__/
 .DS_Store
+.env
 # 模型与大素材（运行说明里给下载地址）
 core/tts/*.onnx
 core/tts/*.bin
@@ -138,4 +139,3 @@ styles/*/demo/**/*_try.py
 styles/*/demo/stills/*_v1*
 !styles/art-deco/demo/stills/kit_v2.jpg
 .idea/
-films/
