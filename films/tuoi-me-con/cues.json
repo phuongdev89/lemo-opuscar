@@ -1,0 +1,8 @@
+[
+  { "t0": 0.5, "t1": 7.0, "text": "Hiện nay, tổng tuổi của hai mẹ con là 42." },
+  { "t0": 7.5, "t1": 14.0, "text": "Sau 5 năm nữa, cả mẹ và con đều tăng 5 tuổi. Tổng mới là 52 tuổi!" },
+  { "t0": 14.5, "t1": 20.8, "text": "Vẽ sơ đồ: Con 1 phần, mẹ 3 phần. Tổng 4 phần bằng 52 tuổi." },
+  { "t0": 21.0, "t1": 25.4, "text": "Giá trị 1 phần, tức tuổi con sau 5 năm, là 52 chia 4 bằng 13 tuổi." },
+  { "t0": 25.8, "t1": 32.0, "text": "Bớt đi 5 năm về hiện tại: Con 8 tuổi, và mẹ là 42 trừ 8 bằng 34 tuổi!" },
+  { "t0": 32.2, "t1": 38.5, "text": "Đáp số: Mẹ 34 tuổi, Con 8 tuổi. Rất rõ ràng và trực quan!" }
+]

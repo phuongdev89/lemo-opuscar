@@ -1,0 +1,23 @@
+1
+00:00:00,500 --> 00:00:07,000
+Hiện nay, tổng tuổi của hai mẹ con là 42.
+
+2
+00:00:07,500 --> 00:00:14,000
+Sau 5 năm nữa, cả mẹ và con đều tăng 5 tuổi. Tổng mới là 52 tuổi!
+
+3
+00:00:14,500 --> 00:00:20,800
+Vẽ sơ đồ: Con 1 phần, mẹ 3 phần. Tổng 4 phần bằng 52 tuổi.
+
+4
+00:00:21,000 --> 00:00:25,400
+Giá trị 1 phần, tức tuổi con sau 5 năm, là 52 chia 4 bằng 13 tuổi.
+
+5
+00:00:25,800 --> 00:00:32,000
+Bớt đi 5 năm về hiện tại: Con 8 tuổi, và mẹ là 42 trừ 8 bằng 34 tuổi!
+
+6
+00:00:32,200 --> 00:00:38,500
+Đáp số: Mẹ 34 tuổi, Con 8 tuổi. Rất rõ ràng và trực quan!
