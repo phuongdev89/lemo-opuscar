@@ -7,6 +7,7 @@ This repository is a library of film styles. Each style has a `styles/<slug>/STY
 | Any request: first see the user's own styles; no request yet: offer the ways in | **Start** below |
 | A film about the user's topic (the normal case) | **Style and story**, **Workflow** below |
 | "Which styles are there?" / no style chosen | **Finding the style** below |
+| A math teaching film (dạy toán, mọi cấp) | [`MATH-VIDEOS.md`](MATH-VIDEOS.md) |
 | Directing: story, sound, rhythm, camera, checks, delivery | [`DIRECTOR.md`](DIRECTOR.md) |
 | Building: install, pages, voice, music, mix | [`TECHNIQUE.md`](TECHNIQUE.md) |
 | Tool commands and flags | [`core/README.md`](core/README.md) |

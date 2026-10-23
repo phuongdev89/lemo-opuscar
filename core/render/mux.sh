@@ -76,6 +76,22 @@ if awk -v a="$AD" -v v="$VD" 'BEGIN { exit !(a + 0 > 0 && v + 0 > 0 && a + 0 < v
   echo "mux.sh: note: the audio ($AD s) is shorter than the video ($VD s); padding it with silence" >&2
 fi
 
+# Logo overlay: on by default (core/assets/logo.png); LEMO_LOGO selects another file or "none" to disable.
+# LEMO_LOGO_POS = tl (top-left, default) or br (bottom-right); LEMO_LOGO_SCALE = logo width as a fraction of the video width (default 0.10); LEMO_LOGO_ALPHA = opacity 0–1 (default 1)
+LOGO="${LEMO_LOGO-$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)/assets/logo.png}"
+case "${LEMO_LOGO_POS:-tl}" in
+  tl) LOGO_X="main_w*0.03"; LOGO_Y="main_h*0.03" ;;
+  br) LOGO_X="main_w-overlay_w-main_w*0.03"; LOGO_Y="main_h-overlay_h-main_h*0.03" ;;
+  *) die "LEMO_LOGO_POS must be tl or br, got '$LEMO_LOGO_POS'" ;;
+esac
+case "${LEMO_LOGO_SCALE:-0.10}" in ''|*[!0-9.]*) die "LEMO_LOGO_SCALE must be a number, got '${LEMO_LOGO_SCALE:-}'";; esac
+case "${LEMO_LOGO_ALPHA:-1}" in ''|*[!0-9.]*) die "LEMO_LOGO_ALPHA must be a number, got '${LEMO_LOGO_ALPHA:-}'";; esac
+LOGO_IN=""; LOGO_PRE=""; LOGO_OVERLAY=""
+if [ "$LOGO" != "none" ]; then
+  [ -f "$LOGO" ] || die "logo not found: $LOGO (set LEMO_LOGO=none to mux without a logo)"
+  LOGO_IN="-i $LOGO"
+fi
+
 if [ "$GR" = "0" ]; then VF="fps=$FPS"; else VF="fps=$FPS,noise=c0s=$GR:allf=t"; fi
 if [ "${LEMO_COLOR:-}" = "bt709" ]; then
   VF="$VF,scale=in_range=pc:out_range=tv:out_color_matrix=bt709,format=yuv420p,setparams=range=tv:colorspace=bt709:color_primaries=bt709:color_trc=bt709"
@@ -83,10 +99,26 @@ if [ "${LEMO_COLOR:-}" = "bt709" ]; then
 else
   VF="$VF,format=yuv420p"; CARGS=""
 fi
+# logo scaled to LEMO_LOGO_SCALE of the video width (scale has no main_w, so measure the video first); overlay position from the expressions above
+if [ -n "$LOGO_IN" ]; then
+  VDIMS=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 "$V") || die "cannot read the video size of '$V'"
+  VW=$(echo "$VDIMS" | cut -d, -f1); VH=$(echo "$VDIMS" | cut -d, -f2)
+  case "$VW$VH" in ''|*[!0-9]*) die "cannot read the video size of '$V' (got '$VDIMS')";; esac
+  LW=$(awk -v w="$VW" -v s="${LEMO_LOGO_SCALE:-0.10}" 'BEGIN { printf "%d", w * s }')
+  [ "$LW" -gt 0 ] || die "LEMO_LOGO_SCALE '${LEMO_LOGO_SCALE:-}' makes the logo 0 px wide on a ${VW}px video"
+  LOGO_PRE="[2:v]scale=$LW:-2:flags=lanczos,format=rgba,colorchannelmixer=aa=${LEMO_LOGO_ALPHA:-1}[lg];"
+  LOGO_OVERLAY="[v][lg]overlay=x='$LOGO_X':y='$LOGO_Y':eval=init[vl];[vl]null[v2]"
+  FC="[0:v]$VF[v];$LOGO_PRE[1:a]$LN,aresample=48000$PAD[a];$LOGO_OVERLAY"
+  MAPV="[v2]"
+else
+  FC="[0:v]$VF[v];[1:a]$LN,aresample=48000$PAD[a]"
+  MAPV="[v]"
+fi
+
 # shellcheck disable=SC2086  (CARGS must split on spaces into several arguments; empty by default)
-ffmpeg -y -loglevel error -i "$V" -i "$A" \
-  -filter_complex "[0:v]$VF[v];[1:a]$LN,aresample=48000$PAD[a]" \
-  -map "[v]" -map "[a]" -c:v libx264 -preset slow -crf 19 -r "$FPS" $CARGS -c:a aac -b:a 256k -movflags +faststart -shortest "$O" \
+ffmpeg -y -loglevel error -i "$V" -i "$A" $LOGO_IN \
+  -filter_complex "$FC" \
+  -map "$MAPV" -map "[a]" -c:v libx264 -preset slow -crf 19 -r "$FPS" $CARGS -c:a aac -b:a 256k -movflags +faststart -shortest "$O" \
   || { rm -f "$O"; die "ffmpeg failed while writing '$O' (its message is above)"; }
 [ -s "$O" ] || { rm -f "$O"; die "no output was written to '$O'"; }
 echo "$O"
