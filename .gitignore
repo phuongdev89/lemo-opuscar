@@ -138,3 +138,4 @@ styles/*/demo/**/*_try.py
 styles/*/demo/stills/*_v1*
 !styles/art-deco/demo/stills/kit_v2.jpg
 .idea/
+films/
