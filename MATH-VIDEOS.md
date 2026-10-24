@@ -132,10 +132,9 @@ phải làm cho kênh Toán thì **không** chèn logo (để mặc định, kh�
 
 ## Quảng cáo kênh
 
-Trước lời chúc cuối, video cho kênh Toán phải đọc một câu quảng cáo kênh ngắn,
-ví dụ: "Nếu video hữu ích, các em hãy Đăng ký kênh Toán Olympic cùng con và
-bấm chuông để không bỏ lỡ bài mới nhé." Không lặp nhiều lần trong một video,
-không đặt giữa bài giảng.
+Trước lời chúc cuối, video cho kênh Toán phải đọc đúng câu quảng cáo kênh sau:
+"Hãy Đăng ký kênh Toán Olympic cùng con để cùng nhau giải các bài toán khó
+nhé." Không lặp nhiều lần trong một video, không đặt giữa bài giảng.
 
 ## Rà soát trước khi gọi TTS
 
