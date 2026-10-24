@@ -6,7 +6,8 @@ toán / có từ "toán" / làm cho kênh Toán**; phim chủ đề khác dùng 
 thường của thư viện và **không** đọc tài liệu này, **không** chèn logo kênh
 Toán. Nguồn sư phạm gốc nằm trong [`docs/math/`](docs/math/) — quy tắc
 dưới đây đã được chuyển thể cho quy trình Lemo (treatment → style → TTS →
-render → mux). Khi có mâu thuẫn, ưu tiên mục "Rà soát trước khi gọi TTS".
+render → mux, rồi cover, `upload.md` và đăng ký lịch đăng sau khi video hoàn
+tất). Khi có mâu thuẫn, ưu tiên mục "Rà soát trước khi gọi TTS".
 
 Vì là phim của người dùng (ngoài `styles/`), phim toán **không có credit
 LemoLab**; watermark logo kênh Toán được chèn ở bước mux theo mục
@@ -135,6 +136,184 @@ phải làm cho kênh Toán thì **không** chèn logo (để mặc định, kh�
 Trước lời chúc cuối, video cho kênh Toán phải đọc đúng câu quảng cáo kênh sau:
 "Hãy Đăng ký kênh Toán Olympic cùng con để cùng nhau giải các bài toán khó
 nhé." Không lặp nhiều lần trong một video, không đặt giữa bài giảng.
+
+## Cover (thumbnail): sinh ảnh riêng, sau khi video hoàn tất
+
+Sau khi mux xong, phim làm cho **kênh Toán** phải có ảnh cover `cover.png`
+(ngang 16:9, 1280×720, dưới 2 MB) đặt cạnh file `.mp4` — thay cho `poster.jpg`
+của phim thường. Cover là ảnh được **thiết kế riêng bằng công cụ sinh ảnh AI**, sinh **sau
+khi video đã hoàn tất**: không cắt frame từ video, không chụp màn hình trang
+phim, không lấy still từ phim làm cover.
+
+Chọn công cụ sinh ảnh theo biến `AI_IMAGE_PROVIDER` trong `.env`:
+
+| `AI_IMAGE_PROVIDER` | Công cụ | Cấu hình |
+|---|---|---|
+| `museai` (ưu tiên) | skill `muse-image` | `MUSEAI_IMAGE_ENDPOINT_URL`, `MUSEAI_IMAGE_API_KEY` |
+| `zpro` (hoặc để trống) | skill `image-generate` | `AI_IMAGE_URL`, `AI_IMAGE_KEY`, `AI_IMAGE_MODEL` |
+
+Khi `AI_IMAGE_PROVIDER=museai` mà `muse-image` lỗi (gateway không phản hồi,
+timeout, mã HTTP lỗi): ghi rõ lỗi rồi **fallback một chiều sang
+`image-generate` (zpro)** với nguyên văn prompt, không quay lại museai trong
+lần sinh này. Nếu cả hai đường đều lỗi hoặc chưa cấu hình: để cover pending
+kèm lý do cụ thể, tuyệt đối không thay bằng frame từ video.
+
+Trước khi sinh ảnh, nghĩ **ba ý tưởng hook khác nhau** từ chính đề toán của
+phim; mỗi ý tưởng gồm: dữ kiện thật từ đề, câu hỏi cụ thể khiến người xem muốn
+biết đáp án, hành động/tương quan hình ảnh thể hiện câu hỏi đó, và tiêu đề
+ngắn (không bắt buộc). Chọn ý tưởng mạnh nhất và ghi lý do chọn. Hook phải thể
+hiện một câu hỏi, quan hệ bất ngờ hoặc thử thách **cụ thể**; tên chủ đề, chữ
+"bí ẩn" chung chung hay dấu hỏi trang trí một mình là chưa đủ. Không bịa dữ
+kiện, độ khó hay lời hứa để gây tò mò.
+
+Dùng prompt mẫu sau, chỉ điền `{{HOOK_SCENE}}` bằng ý tưởng đã chọn (gồm dữ
+kiện nguồn, câu hỏi người xem, nhân vật/đạo cụ/bối cảnh và quan hệ chưa được
+giải đáp):
+
+```
+Tạo thumbnail YouTube ngang 16:9 cho kênh "Toán Olympic cùng con".
+Ý TƯỞNG CẢNH: {{HOOK_SCENE}}
+Phong cách hoạt hình sách truyện cao cấp, thân thiện với trẻ em. Nhân vật
+biểu cảm rõ, đồ vật chính nổi bật; bối cảnh thật, mạch lạc, có chiều sâu,
+chất liệu và ánh sáng ấm. Bố cục dễ hiểu khi xem nhỏ trên điện thoại,
+tương phản tốt.
+Ưu tiên hook: hình phải thể hiện một câu hỏi, quan hệ bất ngờ hoặc thử thách
+CỤ THỂ từ dữ kiện thật trong Ý TƯỞNG CẢNH. Dùng hành động hoặc tương quan
+giữa đồ vật để người xem hiểu điều chưa được giải đáp ngay ở kích thước
+320×180. Khuôn mặt biểu cảm, bong bóng suy nghĩ và dấu hỏi chỉ hỗ trợ, không
+thay thế câu hỏi cụ thể. Nếu thêm chữ: chỉ một tiêu đề tiếng Việt ngắn 3–5
+từ làm rõ thử thách, đúng dấu, dễ đọc, cách mép an toàn; không chỉ gọi tên
+chủ đề/đồ vật hoặc viết "bí ẩn" chung chung. Không tự thêm lời hứa, độ khó
+hay dữ kiện để gây tò mò.
+Không đưa đáp án, lời giải, toàn bộ đề bài hoặc bảng dữ kiện. Không làm ảnh
+giống worksheet, slide bài giảng hay khung chữ. Không tự thêm điều kiện
+toán học.
+```
+
+Rà soát **ảnh thật** ở kích thước nhỏ (~320×180, thu nhỏ xem thử), không chỉ
+đọc prompt:
+
+- Người xem nhận ra một câu hỏi cụ thể của chính đề này chỉ qua ảnh nhỏ? Ảnh
+  đẹp nhưng hook mơ hồ là **rơi** — chọn ý tưởng khác hoặc sinh lại hình.
+- Không lộ đáp án, phép giải hoàn chỉnh, kết quả khoanh tròn (cả hai chế độ;
+  với `guided` thì tuyệt đối).
+- Chữ trên ảnh (nếu có): đúng dấu tiếng Việt, đọc được ở ảnh nhỏ, cách mép
+  an toàn; AI vẽ sai dấu thì sinh lại hoặc bỏ chữ.
+- Số và đơn vị xuất hiện trên ảnh (nếu có) phải đúng với đề.
+
+Ghi vào cuối `upload.md` (mục "Cover"): ba ý tưởng, ý tưởng được chọn kèm lý
+do, **nguyên văn prompt** và provider đã dùng thật (`muse-image` hay
+`image-generate`, kèm lý do nếu đã fallback).
+
+## Tiêu đề, mô tả, caption khi đăng (`upload.md`)
+
+Làm cùng lúc với cover: viết file `upload.md` trong thư mục phim, tiếng Việt,
+sẵn sàng copy-paste khi đăng. Mọi câu chữ bám **nội dung thật** của phim (đề,
+`solution.md`); không bịa nguồn, số liệu, đáp án.
+
+- **Tiêu đề (YouTube, tối đa 60 ký tự):** hook cụ thể từ chính bài toán,
+  không lộ đáp án, không câu view giả. Ví dụ "Cắt sợi dây 84 m thành ba đoạn
+  bằng nhau?" tốt hơn "Bài toán về dây hay".
+- **Mô tả (YouTube):** mở bằng câu hook → **đề bài đầy đủ** (nếu đề gốc
+  tiếng Anh: dẫn nguyên văn tiếng Anh, kèm bản dịch tiếng Việt trung thực;
+  giữ mọi điều kiện, đơn vị) → dòng `Nguồn đề:` riêng, dễ tìm kiếm: tên đầy
+  đủ kỳ thi/sách kèm viết tắt chính thức (nếu đã xác minh), năm, vòng thi,
+  lớp, số câu — thiếu trường nào bỏ trường đó, không rõ thì ghi "nguồn chưa
+  xác minh", không đoán tên đầy đủ từ viết tắt → nội dung video dạy gì
+  (kiến thức, kỹ năng) → lời mời đăng ký (dùng câu quảng cáo kênh ở mục
+  "Quảng cáo kênh") → hashtag. Mốc chương (nếu thêm) phải lấy từ thời lượng
+  thật của cảnh (`events.json`), không ước lượng.
+- **Caption (Facebook/TikTok):** viết **độc lập** với mô tả YouTube — hook
+  diễn đạt khác đi, kèm câu mời bình luận; vẫn giữ nguyên văn đề bài và dòng
+  `Nguồn đề:` đầy đủ dù caption vì thế dài hơn.
+- **Hashtag:** ít và đúng chủ đề — luôn có `#ToanOlympicCungCon`, thêm
+  hashtag chủ đề toán (phân số, hình học…) và lớp/độ tuổi đã chọn; không tag
+  trending không liên quan, không bịa tên kỳ thi.
+- **Không tự chèn link ngoài** (nguồn đề, Scribd…); người dùng tự thêm tay.
+- **Không xưng ngôi thứ nhất** ở mọi câu chữ (không "tôi", "mình", "thầy",
+  "cô") — đồng bộ với quy tắc lời đọc.
+- **Không tiết lộ đáp án hay lời giải hoàn chỉnh** trong tiêu đề, hook, đề
+  bài đăng kèm — áp dụng cho cả hai chế độ.
+
+## Đăng ký vào lịch đăng (`calendar.json`)
+
+Bước cuối, sau cover và `upload.md`: ghi `calendar.json` **ngay trong thư mục
+phim**, cạnh file `.mp4` và `cover.png` — không tạo thư mục riêng, không copy
+file đi đâu. Thư mục phim nằm trong `<OUTPUT_DIR>/`, nên:
+
+- Nếu `OUTPUT_DIR` là thư mục do app lịch đăng quản trị (ví dụ
+  `D:/Affiliate/02_Content_Production/Toán Olympic Cùng Con`), app quét
+  filesystem sẽ **tự nhận thư mục phim thành một campaign trên lịch** — không
+  cần đăng ký gì thêm.
+- Với `OUTPUT_DIR` mặc định (`films/`), `calendar.json` vẫn luôn được ghi như
+  một sản phẩm bàn giao: chuyển thư mục phim vào cây calendar sau bao lâu thì
+  lịch tự có ngay.
+
+`calendar.json` ghi đúng mẫu sau (bám mẫu thật của app; nhóm trường quảng
+cáo/sản phẩm giữ trống nguyên), với đường dẫn trỏ tới file thật trong thư mục
+phim:
+
+```json
+{
+  "id": "<yyyy-mm-dd>_<slug>",
+  "title": "<tiêu đề YouTube>",
+  "idea": "<tiêu đề YouTube>",
+  "scheduled_date": "<yyyy-mm-dd>",
+  "koc": "Toán Olympic Cùng Con",
+  "product_url": "",
+  "created_at": "<ISO 8601>",
+  "published_at": null,
+  "ai_status": "",
+  "status": "SCHEDULED",
+  "scheduled_time": "",
+  "published_url": "",
+  "item_ids": [],
+  "video_meta": {
+    "filename": "<tên-file-mp4>",
+    "size": 0,
+    "duration": 0,
+    "width": 1920,
+    "height": 1080,
+    "codec": "h264",
+    "fps": 24,
+    "bitrate": 0,
+    "path": "<tên-file-mp4>"
+  },
+  "cover_path": "cover.png",
+  "tryon_photo_path": "",
+  "link_placement": "none",
+  "published_links": [],
+  "product_urls": [],
+  "product_photo_paths": [],
+  "affiliate_in_caption": false,
+  "products": [],
+  "share_affiliate": false,
+  "comment_image_path": "",
+  "reference_url": "",
+  "reference_platform": "",
+  "reference_video_id": "",
+  "bgm_source": "",
+  "bgm_path": "",
+  "bgm_warning": "",
+  "posting_at": "",
+  "tryon_photo_paths": [],
+  "planned_outfit_count": 0,
+  "youtube_title": "<tiêu đề YouTube>",
+  "youtube_description": "<mô tả YouTube>",
+  "facebook_caption": "<caption Facebook/TikTok>"
+}
+```
+
+- `id` = tên thư mục phim; `title`, `idea`, `youtube_title`,
+  `youtube_description`, `facebook_caption` copy nguyên văn từ `upload.md` —
+  một nguồn nội dung duy nhất.
+- `scheduled_date` là ngày đăng dự kiến: dùng ngày người dùng đã hẹn, không có
+  thì dùng ngày hoàn tất phim (đổi ngày sau bằng kéo thả trong app).
+- `status` để `SCHEDULED`; không tự điền `published_url`, `published_links`,
+  `published_at` — app ghi các trường này sau khi đăng thật.
+- `video_meta` đo bằng ffprobe từ file `.mp4` cuối (size, duration, codec,
+  fps, bitrate), không ước lượng; `path` và `filename` là tên file `.mp4`
+  thật trong thư mục phim.
 
 ## Rà soát trước khi gọi TTS
 

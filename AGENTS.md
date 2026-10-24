@@ -84,6 +84,7 @@ Report progress in the user's language. If a step fails, read the error, fix the
 ## Where things go
 
 - The film's project folder defaults to `<OUTPUT_DIR>/<name>/` (by default `films/<name>/`, configurable via `OUTPUT_DIR` in `.env`), or `<name>/` in the user's folder in skill mode (see the skill's `SKILL.md`). Wherever a guide says `films/<name>/`, read "the project folder". Work only there, unless the user asks you to work in their own project.
+- Name the project folder `<yyyy-mm-dd>_<slug>/`: the date the folder is created, then `_`, then a short kebab-case slug of the film's topic — e.g. `films/2026-10-24_bai-toan-xe-buyt/`. If the name is already taken, append `-2`, `-3`… to the slug; keep the date prefix.
 - Run `node core/…` and `sh tools/…` from the library root (`$LIB` in skill mode).
 - `core/` has ready-made tools (rendering, TTS, speech check, sampler, sfx, mux). Use them or your own stack, but don't edit `core/` or `styles/` for a user's film.
 - Never kill processes you didn't start. Don't leave background processes running.
