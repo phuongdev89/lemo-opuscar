@@ -1,12 +1,16 @@
 # Video dạy toán: bộ quy tắc
 
 Quy tắc cho phim **dạy toán** (mọi cấp: tiểu học, THCS, THPT, Olympic) làm bằng
-thư viện này. Nguồn sư phạm gốc nằm trong [`docs/math/`](docs/math/) — quy tắc
+thư viện này. **Chỉ đọc bộ quy tắc này khi yêu cầu là video dạy toán / giải
+toán / có từ "toán" / làm cho kênh Toán**; phim chủ đề khác dùng quy trình
+thường của thư viện và **không** đọc tài liệu này, **không** chèn logo kênh
+Toán. Nguồn sư phạm gốc nằm trong [`docs/math/`](docs/math/) — quy tắc
 dưới đây đã được chuyển thể cho quy trình Lemo (treatment → style → TTS →
 render → mux). Khi có mâu thuẫn, ưu tiên mục "Rà soát trước khi gọi TTS".
 
 Vì là phim của người dùng (ngoài `styles/`), phim toán **không có credit
-LemoLab, không watermark**; logo kênh do `mux.sh` chèn tự động (mục Logo).
+LemoLab**; watermark logo kênh Toán được chèn ở bước mux theo mục
+"Logo / watermark kênh".
 
 ## Trách nhiệm của agent
 
@@ -83,7 +87,7 @@ lời giới thiệu chung ("bài toán rất thú vị"), không tiết lộ đ
 
 Thứ tự cảnh: `introduction → problem (đọc nguyên văn đề) → strategy →
 solution (mỗi cảnh một bước, đủ lý do) → check (cách tự kiểm tra) → answer
-(chỉ ở chế độ answer) → closing (CTA nếu có, rồi lời chúc)`.
+(chỉ ở chế độ answer) → closing (câu quảng cáo kênh, rồi lời chúc)`.
 
 Với `guided`: `… → solution (chưa hoàn tất đáp án) → check → practice → closing`.
 
@@ -91,13 +95,21 @@ Không ép độ dài; không bỏ giả thiết, điều kiện xác định, t
 kiểm tra. Kiểm tra chữ và thời gian đọc trên hình bằng
 `node core/render/readcheck.mjs`.
 
-## Logo
+## Logo / watermark kênh
 
-`mux.sh` mặc định chèn logo của kênh (`core/assets/logo.png`, logo "Toán
-Olympic cùng con") vào **mọi video**: góc trên bên trái theo mặc định, hoặc góc
-dưới bên phải qua `LEMO_LOGO_POS=br`; tắt bằng `LEMO_LOGO=none`, đổi kích
-thước/độ mờ qua `LEMO_LOGO_SCALE` / `LEMO_LOGO_ALPHA`. Không cần làm gì thêm
-trong trang.
+Video làm cho **kênh Toán** phải được mux với `LEMO_LOGO=default` để chèn
+watermark logo kênh ("Toán Olympic cùng con", file `core/assets/logo.png`):
+góc trên bên trái theo mặc định, hoặc góc dưới bên phải qua `LEMO_LOGO_POS=br`;
+đổi kích thước/độ mờ qua `LEMO_LOGO_SCALE` / `LEMO_LOGO_ALPHA`. Phim không
+phải làm cho kênh Toán thì **không** chèn logo (để mặc định, không set
+`LEMO_LOGO`). Không vẽ logo trong trang; logo chỉ nằm ở bước mux.
+
+## Quảng cáo kênh
+
+Trước lời chúc cuối, video cho kênh Toán phải đọc một câu quảng cáo kênh ngắn,
+ví dụ: "Nếu video hữu ích, các em hãy Đăng ký kênh Toán Olympic cùng con và
+bấm chuông để không bỏ lỡ bài mới nhé." Không lặp nhiều lần trong một video,
+không đặt giữa bài giảng.
 
 ## Rà soát trước khi gọi TTS
 

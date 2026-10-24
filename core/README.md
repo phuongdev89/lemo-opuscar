@@ -76,7 +76,7 @@ All four page tools take `--size WxH` (default `1920x1080`, even numbers) and `-
 | `LEMO_ANGLE` | WebGL backend (default `metal` on macOS; `default` passes none) |
 | `RENDER_SLOTS` | optional; limits concurrent full renders across processes |
 | `LEMO_COLOR=bt709` | `mux.sh` writes limited-range BT.709 instead of the default full-range output |
-| `LEMO_LOGO` | logo overlaid by `mux.sh` on every film (default `core/assets/logo.png`); a path to another PNG, or `none` to mux without a logo |
+| `LEMO_LOGO` | logo overlaid by `mux.sh` — off by default; `default` uses `core/assets/logo.png`, or a path to another PNG, or `none` (used for math-channel films, see `MATH-VIDEOS.md`) |
 | `LEMO_LOGO_POS` | logo corner: `tl` (top-left, default) or `br` (bottom-right) |
 | `LEMO_LOGO_SCALE` | logo width as a fraction of the video width (default `0.10`) |
 | `LEMO_LOGO_ALPHA` | logo opacity 0–1 (default `1`) |

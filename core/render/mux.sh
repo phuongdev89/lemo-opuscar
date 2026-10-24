@@ -76,9 +76,11 @@ if awk -v a="$AD" -v v="$VD" 'BEGIN { exit !(a + 0 > 0 && v + 0 > 0 && a + 0 < v
   echo "mux.sh: note: the audio ($AD s) is shorter than the video ($VD s); padding it with silence" >&2
 fi
 
-# Logo overlay: on by default (core/assets/logo.png); LEMO_LOGO selects another file or "none" to disable.
+# Logo overlay: off by default; films for the math channel opt in with LEMO_LOGO=default (uses core/assets/logo.png),
+# a path to another PNG, or "none" (the default) for no logo.
 # LEMO_LOGO_POS = tl (top-left, default) or br (bottom-right); LEMO_LOGO_SCALE = logo width as a fraction of the video width (default 0.10); LEMO_LOGO_ALPHA = opacity 0–1 (default 1)
-LOGO="${LEMO_LOGO-$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)/assets/logo.png}"
+LOGO="${LEMO_LOGO:-none}"
+[ "$LOGO" = "default" ] && LOGO="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)/assets/logo.png"
 case "${LEMO_LOGO_POS:-tl}" in
   tl) LOGO_X="main_w*0.03"; LOGO_Y="main_h*0.03" ;;
   br) LOGO_X="main_w-overlay_w-main_w*0.03"; LOGO_Y="main_h-overlay_h-main_h*0.03" ;;
