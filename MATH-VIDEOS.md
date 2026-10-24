@@ -87,6 +87,24 @@ bước quyết định hoặc đáp án.
 
 Bảng đổi đầy đủ: [`docs/math/voice-text-rules.md`](docs/math/voice-text-rules.md).
 
+## Giải thích rõ ràng theo cấp học
+
+- Luôn giải thích **rõ ràng, đầy đủ, phù hợp với cấp học** của người xem —
+  **không nói vắn tắt**, không lướt qua bước nào "vì nhanh". Mỗi phép biến đổi
+  quan trọng phải nêu được vì sao làm và điều kiện gì cho phép làm.
+- Mức độ chi tiết theo lớp đã chọn: lớp nhỏ giải thích từng thao tác nhỏ bằng
+  ngôn ngữ đời thường; lớp lớn có thể gọn hơn nhưng vẫn đủ lý do ở mỗi bước
+  suy luận then chốt. Không bỏ bước trung gian vì "các em tự hiểu".
+- Câu kiểm tra: người xem của lớp đó nghe một lần có thể theo được trọn vẹn
+  mà không cần đoán bước bị nhảy qua.
+
+## Phụ đề: luôn tắt
+
+Video Toán **luôn luôn tắt phụ đề**: không xuất `.srt`, không vẽ phụ đề/caption
+trong trang, không burn chữ lời thoại vào hình. Chữ trên màn hình chỉ là nội
+dung bài giảng (đề, công thức, sơ đồ, tiêu đề bước) do style quy định, không
+phải lời thoại. Quy tắc này ghi đè các bước subtitle trong `TECHNIQUE.md`.
+
 ## Cấu trúc video
 
 Mở đầu bằng **hook là thử thách của chính bài toán**: chào ngắn → nhiệm vụ hôm
@@ -123,6 +141,10 @@ không đặt giữa bài giảng.
 
 - Không còn cách xưng ngôi thứ nhất nào khi nói về mình (tôi, mình, thầy, cô…)
   trong lời thoại? "Chúng ta cùng…" thì được phép?
+- Mỗi bước quan trọng được giải thích rõ ràng, đủ lý do, phù hợp cấp học —
+  không có bước nào bị nói vắn tắt hay nhảy qua?
+- Phụ đề đã tắt hoàn toàn (không `.srt`, không caption trong trang, không
+  burn lời thoại vào hình)?
 - Người học có đủ kiến thức nền cho cách giải đã chọn không?
 - Các bước quan trọng có lý do, điều kiện đúng, thuật ngữ nhất quán không?
 - Hình, lời đọc và công thức cùng diễn đạt một quan hệ toán học không?
