@@ -71,6 +71,12 @@ bước quyết định hoặc đáp án.
 
 - Giọng **nam** (VieNeu qua `core/tts/tts_vi.py`), xưng **thầy**, gọi **các em /
   các con / các bạn nhỏ**. Không dùng "cô".
+- **Cấm mọi đại từ nhân xưng ngôi thứ nhất trong lời thoại** (tôi, mình, chúng
+  ta, chúng tôi, tao…). "Thầy" là danh từ chỉ vai, không phải đại từ, nên là
+  cách xưng duy nhất được dùng khi cần tự nhắc; ưu tiên viết câu không cần chủ
+  ngữ ("Trừ năm ở cả hai vế…" thay vì "Thầy sẽ trừ…"). Quy tắc này áp dụng cho
+  **mọi lời thoại**: lời giảng, hook, đọc đề, check, practice, quảng cáo kênh và
+  lời chúc.
 - Viết số và ký hiệu thành chữ trong lời đọc: `2x + 5 = 17` → "hai nhân x cộng
   năm bằng mười bảy"; `1/2` → "một phần hai"; `30%` → "ba mươi phần trăm";
   `12 cm²` → "mười hai xăng ti mét vuông". Không đưa LaTeX vào `voiceText`.
@@ -113,6 +119,8 @@ không đặt giữa bài giảng.
 
 ## Rà soát trước khi gọi TTS
 
+- Không còn đại từ ngôi thứ nhất nào trong lời thoại (tôi, mình, chúng ta…;
+  chỉ còn "thầy" khi cần tự nhắc)?
 - Người học có đủ kiến thức nền cho cách giải đã chọn không?
 - Các bước quan trọng có lý do, điều kiện đúng, thuật ngữ nhất quán không?
 - Hình, lời đọc và công thức cùng diễn đạt một quan hệ toán học không?
