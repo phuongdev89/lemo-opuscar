@@ -82,7 +82,11 @@ problem independently and compare the supplied solution. Inspect the actual imag
 counts, labels, units, geometry, readable Vietnamese text, clipping, overlaps, consistency
 with timestamped narration, age-appropriate reasoning, and premature answer disclosure.
 In guided mode the final answer and decisive unfinished step must never be disclosed.
-No captions are expected; instructional text is allowed. Inspect cover images for answer
+No captions are expected; instructional text is allowed. Math films must not use
+whiteboard or white-paper/worksheet layouts. Flag actual visual violations. Require
+thorough step-by-step explanations appropriate to the grade. Fixed voice Minh Quân Pro,
+slow narration, no background music and no SFX are production requirements, but do not
+claim to verify these audio properties from still images or text alone. Inspect cover images for answer
 leakage and fidelity to the original problem. Do not assume unseen video intervals pass.
 If images are unreadable, required source evidence is absent, or timing cannot be
 established, return insufficient_evidence. You cannot certify audio from text alone.

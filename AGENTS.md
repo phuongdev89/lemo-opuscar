@@ -16,6 +16,8 @@ This repository is a library of film styles. Each style has a `styles/<slug>/STY
 
 **Films outside `styles/` are the user's: no LemoLab credit, no watermark.**
 
+**Math films:** follow `MATH-VIDEOS.md`: fixed Minh Quân Pro voice, slow and thorough explanations, no background music or sound effects, no white-paper/whiteboard styles. These user requirements override conflicting style/demo defaults; choose a compatible style.
+
 ## Start
 
 - **Their own styles first.** If `~/lemo-my-styles/README.md` exists, read it: it lists every style the user has saved, wherever it's kept, and their own styles ([`MY-STYLES.md`](MY-STYLES.md)) count like library styles. When they name a style, look there first, then in the library.

@@ -80,6 +80,44 @@ riêng không tự gọi QA. Vision chỉ xác nhận các ảnh đã xem, khôn
 mọi frame hay audio. Agent vẫn nghe lời đọc, kiểm tra đồng bộ thực tế và
 kiểm chứng phép tính bằng code trước khi giao.
 
+## Mặc định cố định cho mọi video Toán
+
+Các yêu cầu sau ghi đè mặc định âm thanh/phong cách trong DIRECTOR.md,
+TECHNIQUE.md và demo. Không hỏi lại ở mỗi phim, chỉ đổi khi người dùng
+chỉ định rõ ngoại lệ cho phim đó.
+
+- **Giọng duy nhất: Minh Quân Pro**, preset VieNeu-TTS v3 Turbo. Truyền
+  chính xác `--voice "Minh Quân Pro"`; mọi dòng trong `lines.json` phải dùng
+  giọng này (hoặc không khai báo voice để nhận giá trị CLI). Không tự chuyển
+  sang giọng nam khác, voice clone hoặc provider khác khi lỗi/thiếu preset.
+- **Giải thích cặn kẽ và chậm rãi**: mỗi thao tác có lý do, có bước trung
+  gian, diễn giải ký hiệu/đơn vị theo trình độ. Không rút gọn lời giải để ép
+  thời lượng. Ngắt câu ngắn; chừa khoảng dừng để quan sát hình và suy nghĩ.
+- **Tốc độ khởi điểm 0.90×** so với audio TTS gốc. Nghe thử và có thể giảm
+  thêm khi cần rõ hơn; không tăng tốc để rút ngắn phim. Công cụ
+  `core/tts/tts_vi.py` hiện đọc `--speed` cho cache nhưng chưa áp dụng vào
+  audio; không coi truyền cờ này là đã làm chậm. Sinh WAV gốc rồi xử lý bằng
+  FFmpeg `-af "atempo=0.90"` ra WAV mới (giữ cao độ), không ghi đè WAV gốc.
+  Đo lại duration và word timing từ WAV đã làm chậm, thêm khoảng dừng ngoài
+  lời đọc khi cần; timeline/render phải theo audio cuối. Không làm chậm lặp
+  nhiều lần trên file đã xử lý.
+- **Không nhạc nền, không hiệu ứng âm thanh** ở mọi cảnh, kể cả mở/kết,
+  chuyển cảnh, tiếng viết/phấn, tiếng click, chime, whoosh, âm thanh đáp án.
+  Bỏ bước tạo score/foley/SFX và mọi audio track từ demo; mix chỉ có lời đọc
+  và khoảng lặng. Không sinh nhạc rồi chỉ giảm volume. Nghe MP4 cuối để xác
+  nhận không sót track âm thanh phụ.
+- **Không dùng style giấy trắng hoặc bảng trắng** cho Toán: loại
+  `whiteboard` (Whiteboard Explainer), bố cục tờ giấy trắng/worksheet,
+  trang vở trắng và slide nền trắng mô phỏng giấy/bảng trắng. Không đề xuất
+  các hướng này khi chọn style. Nếu style đã chọn bắt buộc hình thức đó,
+  chọn style khác phù hợp, không sửa invariants của STYLE.md. Giấy màu và
+  các style khác chỉ được dùng khi không trở lại bố cục giấy/bảng trắng.
+
+QA vision phải kiểm tra ảnh thật có vi phạm nền giấy/bảng trắng, bước giải
+bị nhảy hoặc thiếu minh họa không. Giọng, độ chậm, nhạc và SFX cần agent
+kiểm tra cấu hình, nguồn track và nghe audio cuối; vision không tự chứng
+nhận những tiêu chí âm thanh này từ ảnh hay lời thoại dạng chữ.
+
 ## Trách nhiệm của agent
 
 Agent đọc đề, **giải và kiểm chứng độc lập trước** khi viết kịch bản. Kiểm tra
@@ -137,7 +175,7 @@ bước quyết định hoặc đáp án.
 
 ## Lời đọc tiếng Việt
 
-- Giọng **nam** (VieNeu qua `core/tts/tts_vi.py`), gọi người học là **các em /
+- Cố định **Minh Quân Pro** (VieNeu, theo mục mặc định ở trên), gọi người học là **các em /
   các con / các bạn nhỏ**.
 - **Không bao giờ xưng hô ngôi thứ nhất khi nói về mình** — không "tôi", không
   "mình", không "thầy", không "cô", không bất kỳ cách tự xưng nào khác. Người
@@ -391,6 +429,11 @@ phim:
   thật trong thư mục phim.
 
 ## Rà soát trước khi gọi TTS
+
+- Đúng giọng Minh Quân Pro trên mọi dòng, không có voice override khác?
+- Đã bố trí lời đọc chậm, ngắt nghỉ và giải thích từng bước cặn kẽ?
+- Đã bỏ toàn bộ nhạc/SFX của demo, chỉ giữ narration và khoảng lặng?
+- Style và hình thực tế không phải giấy trắng, worksheet hay bảng trắng?
 
 - Không còn cách xưng ngôi thứ nhất nào khi nói về mình (tôi, mình, thầy, cô…)
   trong lời thoại? "Chúng ta cùng…" thì được phép?
