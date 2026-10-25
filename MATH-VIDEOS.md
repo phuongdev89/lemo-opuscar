@@ -13,6 +13,15 @@ Vì là phim của người dùng (ngoài `styles/`), phim toán **không có cr
 LemoLab**; watermark logo kênh Toán được chèn ở bước mux theo mục
 "Logo / watermark kênh".
 
+## Cấu hình riêng cho video toán
+
+Cấu hình dịch vụ dùng chung nằm trong **`.env` tại root repository**.
+**`.env.math` chỉ định nghĩa `OUTPUT_DIR`** cho phim toán; không chứa key,
+model hay thứ tự provider. Đặt `$env:LEMO_ENV_FILE = ".env.math"` trước khi
+chạy công cụ core: chúng đọc `.env`, rồi ghi đè duy nhất `OUTPUT_DIR` từ
+`.env.math`. Các công cụ ngoài core phải nhận thư mục đầu ra tương ứng.
+Mọi skill đọc cấu hình global trước, rồi project ghi đè từng giá trị. Thiếu cấu hình bắt buộc sau khi hợp nhất thì dừng và báo người dùng bổ sung; không bỏ qua tầng. Không sao chép secret global vào project.
+
 ## Trách nhiệm của agent
 
 Agent đọc đề, **giải và kiểm chứng độc lập trước** khi viết kịch bản. Kiểm tra
@@ -145,18 +154,26 @@ của phim thường. Cover là ảnh được **thiết kế riêng bằng côn
 khi video đã hoàn tất**: không cắt frame từ video, không chụp màn hình trang
 phim, không lấy still từ phim làm cover.
 
-Chọn công cụ sinh ảnh theo biến `AI_IMAGE_PROVIDER` trong `.env`:
+Chuỗi skill bắt buộc: **image-generate → api-image → muse-image**, dùng chung
+mọi loại phim. Đọc hướng dẫn skill hiện tại. image-generate gọi tool built-in trước;
+khi không có/không khả dụng mới dùng api-image. api-image đọc cấu hình
+`API_IMAGE_*` trong `.env`, tự quản lý gateway theo `API_IMAGE_PROVIDER`.
+Không gọi lại api-image nếu image-generate đã chuyển sang nó.
+Chỉ fallback sang muse-image sau khi API hết lựa chọn vì lỗi cho phép chuyển tầng.
+Mọi skill đọc global trước, project ghi đè từng giá trị; thiếu cấu hình thì dừng và báo người dùng bổ sung, không chuyển tầng vì thiếu cấu hình.
+Giữ nguyên prompt và yêu cầu ảnh. Lỗi đầu vào phải sửa; từ chối an toàn hoặc
+job chưa rõ trạng thái phải dừng, không tự gửi lại. Hết tầng thì cover pending,
+không thay bằng frame video. `.env.math` chỉ chứa thư mục đầu ra.
 
-| `AI_IMAGE_PROVIDER` | Công cụ | Cấu hình |
-|---|---|---|
-| `museai` (ưu tiên) | skill `muse-image` | `MUSEAI_IMAGE_ENDPOINT_URL`, `MUSEAI_IMAGE_API_KEY` |
-| `zpro` (hoặc để trống) | skill `image-generate` | `AI_IMAGE_URL`, `AI_IMAGE_KEY`, `AI_IMAGE_MODEL` |
-
-Khi `AI_IMAGE_PROVIDER=museai` mà `muse-image` lỗi (gateway không phản hồi,
-timeout, mã HTTP lỗi): ghi rõ lỗi rồi **fallback một chiều sang
-`image-generate` (zpro)** với nguyên văn prompt, không quay lại museai trong
-lần sinh này. Nếu cả hai đường đều lỗi hoặc chưa cấu hình: để cover pending
-kèm lý do cụ thể, tuyệt đối không thay bằng frame từ video.
+Agent phải gọi built-in trước. Khi đã xác minh built-in không có/không khả dụng,
+có thể chạy fallback cho cover mới (không có ảnh tham chiếu):
+```powershell
+python tools/math_cover.py --prompt-file films/<ten-phim>/cover-prompt.txt --output films/<ten-phim>/cover.png --builtin-unavailable not-present
+python tools/math_cover.py --dry-run
+```
+Chọn lý do thực tế, không dùng `not-present` khi tool có sẵn. Script không gọi
+được tool built-in của host. `cover.result.json` ghi kết quả kỹ thuật;
+agent vẫn phải xem ảnh và ghi skill/provider thực tế cùng lý do fallback trong upload.md.
 
 Trước khi sinh ảnh, nghĩ **ba ý tưởng hook khác nhau** từ chính đề toán của
 phim; mỗi ý tưởng gồm: dữ kiện thật từ đề, câu hỏi cụ thể khiến người xem muốn
@@ -203,7 +220,7 @@ Rà soát **ảnh thật** ở kích thước nhỏ (~320×180, thu nhỏ xem th
 
 Ghi vào cuối `upload.md` (mục "Cover"): ba ý tưởng, ý tưởng được chọn kèm lý
 do, **nguyên văn prompt** và provider đã dùng thật (`muse-image` hay
-`image-generate`, kèm lý do nếu đã fallback).
+`image-generate`, `api-image`, kèm lý do nếu đã fallback).
 
 ## Tiêu đề, mô tả, caption khi đăng (`upload.md`)
 

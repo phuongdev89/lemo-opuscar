@@ -6,21 +6,29 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 def load_dotenv():
-    env_path = REPO_ROOT / '.env'
-    if not env_path.exists():
-        return {}
+    # Shared settings first; optional film-type file overrides only OUTPUT_DIR.
     res = {}
-    with open(env_path, 'r', encoding='utf-8') as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith('#'):
+    paths = [REPO_ROOT / '.env']
+    selected = os.environ.get('LEMO_ENV_FILE')
+    if selected:
+        overlay = Path(selected)
+        if not overlay.is_absolute():
+            overlay = REPO_ROOT / overlay
+        if not overlay.is_file():
+            raise FileNotFoundError(f'Configuration file not found: {overlay}')
+        if overlay.resolve() != paths[0].resolve():
+            paths.append(overlay)
+    for index, path in enumerate(paths):
+        if not path.is_file():
+            continue
+        for raw in path.read_text(encoding='utf-8-sig').splitlines():
+            line = raw.strip()
+            if not line or line.startswith('#') or '=' not in line:
                 continue
-            if '=' not in line:
-                continue
-            k, v = line.split('=', 1)
-            k = k.strip()
-            v = v.strip().strip('"').strip("'")
-            res[k] = v
+            key, value = line.split('=', 1)
+            key = key.strip()
+            if index == 0 or key == 'OUTPUT_DIR':
+                res[key] = value.strip().strip('"').strip("'")
     return res
 
 

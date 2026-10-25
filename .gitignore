@@ -142,3 +142,6 @@ styles/*/demo/stills/*_v1*
 films/
 tmp_test/
 .scratch/
+# Private configuration per video type
+.env.*
+!.env.*.example

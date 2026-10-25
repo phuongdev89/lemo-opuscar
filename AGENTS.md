@@ -88,3 +88,17 @@ Report progress in the user's language. If a step fails, read the error, fix the
 - Run `node core/…` and `sh tools/…` from the library root (`$LIB` in skill mode).
 - `core/` has ready-made tools (rendering, TTS, speech check, sampler, sfx, mux). Use them or your own stack, but don't edit `core/` or `styles/` for a user's film.
 - Never kill processes you didn't start. Don't leave background processes running.
+
+## Shared skill configuration and image generation
+
+- For every skill, resolve configuration from its documented global sources first, then overlay the project configuration. Project values override global values per key; unspecified project values retain global defaults. Do not copy global secrets into the project.
+- If required configuration is still missing or invalid after merging, stop and tell the user exactly which configuration fields to add or fix, without exposing secrets. Missing configuration is not a reason to skip a skill or provider and continue the fallback chain. Host-managed built-in tools require no invented API configuration.
+- Read each installed SKILL.md before use. If its native loader does not implement this precedence, explicitly pass the merged configuration through supported parameters or the project adapter; do not assume it does.
+- All film types use the image skill chain: **image-generate → api-image → muse-image**. Start with the host's built-in image tool through image-generate. Enter api-image once only when the built-in tool is absent, unsupported, or unavailable because of service, quota, or access errors.
+- api-image owns its gateway chain through API_IMAGE_PROVIDER. Do not repeat gateways outside that skill. Enter muse-image only after the API chain exhausts its gateways due to eligible service errors, never due to missing configuration.
+- Stop on invalid input, safety refusal, or uncertain job status. Preserve prompt, references, size, aspect ratio, and quality across tiers.
+- tools/film_image.py implements API → Muse for new images only. The agent must handle the built-in tier first and supply --builtin-unavailable with a verified reason. Use the skills directly for reference images or editing.
+- --dry-run makes no network calls and reports configuration issues. --cover normalizes output to PNG at 1280x720 under 2 MB. Inspect the actual image before accepting it.
+- Keep code-native style artwork when required by STYLE.md.
+- Shared project settings belong in .env. For math films, read MATH-VIDEOS.md; .env.math contains only OUTPUT_DIR. Set LEMO_ENV_FILE=.env.math so core loads shared settings and overrides the output directory.
+- tools/math_cover.py is a compatibility entry point with --cover and the same built-in prerequisite.
