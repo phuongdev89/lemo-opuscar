@@ -15,12 +15,70 @@ LemoLab**; watermark logo kênh Toán được chèn ở bước mux theo mục
 
 ## Cấu hình riêng cho video toán
 
-Cấu hình dịch vụ dùng chung nằm trong **`.env` tại root repository**.
-**`.env.math` chỉ định nghĩa `OUTPUT_DIR`** cho phim toán; không chứa key,
-model hay thứ tự provider. Đặt `$env:LEMO_ENV_FILE = ".env.math"` trước khi
-chạy công cụ core: chúng đọc `.env`, rồi ghi đè duy nhất `OUTPUT_DIR` từ
-`.env.math`. Các công cụ ngoài core phải nhận thư mục đầu ra tương ứng.
-Mọi skill đọc cấu hình global trước, rồi project ghi đè từng giá trị. Thiếu cấu hình bắt buộc sau khi hợp nhất thì dừng và báo người dùng bổ sung; không bỏ qua tầng. Không sao chép secret global vào project.
+Cấu hình dịch vụ dùng chung nằm trong `.env` tại root repository. `.env.math`
+chứa `OUTPUT_DIR` và có thể ghi đè riêng `AI_QA_REQUIRED`, `AI_QA_URL`,
+`AI_QA_KEY`, `AI_QA_MODEL` cho QA Toán. File `.example` chỉ là mẫu, không
+được công cụ đọc khi chạy. Không ghi key thật vào file mẫu.
+
+Công cụ QA hợp nhất cấu hình theo từng key: biến môi trường → `.env` →
+`.env.math` (file project ghi đè). Chỉ chuỗi `true` (không phân biệt hoa/thường)
+bật QA. Thiếu cờ hoặc giá trị khác: bỏ qua hoàn toàn, không kiểm tra key,
+không gọi API. Khi đã bật, thiếu cấu hình phải dừng, không fallback provider.
+
+Công cụ core hiện đọc `.env` và không tự đọc `.env.math`; truyền đúng đường
+ dẫn/thư mục đầu ra cho công cụ đang dùng. Không giả định biến QA được core xử lý.
+
+## QA vision có điều kiện — bắt buộc khi AI_QA_REQUIRED=true
+
+Agent áp dụng hai cổng kiểm tra bằng `tools/math_qa.py`:
+
+1. `assets`: sau khi có đề gốc, lời giải, lời thoại và ảnh tài nguyên thật,
+   trước khi dựng/render toàn bộ video.
+2. `final`: sau khi mux và sinh cover, trước khi ghi `calendar.json` và bàn giao.
+   Lấy khung hình từ MP4 cuối bằng FFmpeg, ở mỗi bước giải, trước/sau chuyển
+   cảnh và lúc hiện đáp án; đưa cả cover vào bộ kiểm tra. Gắn timestamp giây
+   thật và ghi rõ cover trong nhãn. Nếu nhiều hơn 40 ảnh, chia thành nhiều
+   manifest/batch, chạy và lưu báo cáo từng batch riêng; tất cả phải đạt.
+
+Tạo manifest trong thư mục phim (đường dẫn tương đối với manifest):
+
+```json
+{
+  "mode": "answer",
+  "grade": "Lớp 2",
+  "problem": "problem.md",
+  "solution": "solution.md",
+  "narration": "narration-timeline.md",
+  "images": [
+    {"path": "qa/frame-12.png", "timestamp": 12, "label": "Đọc đề"},
+    {"path": "cover.png", "timestamp": 0, "label": "Cover, không phải frame video"}
+  ]
+}
+```
+
+`problem.md` giữ nguyên đề và dữ kiện gốc; đề dạng ảnh phải được đưa vào bộ
+ảnh `assets` để đối chiếu bản chép. `narration-timeline.md` ghi lời thoại kèm
+mốc bắt đầu/kết thúc thật. Manifest final dùng khung hình mới trích từ bản
+render cuối, không lấy lại ảnh preview. Tách manifest assets và final.
+
+```powershell
+python tools/math_qa.py --manifest films/<phim>/qa-input-assets.json --stage assets --dry-run
+python tools/math_qa.py --manifest films/<phim>/qa-input-assets.json --stage assets
+python tools/math_qa.py --manifest films/<phim>/qa-input-final.json --stage final
+```
+
+Báo cáo `qa-assets.json` / `qa-final.json` được ghi cạnh manifest. Dùng tên
+manifest `qa-input-assets.json` và `qa-input-final.json`. Mã thoát: 0 = đạt hoặc QA tắt,
+1 = không đạt/chưa đủ bằng chứng, 2 = lỗi cấu hình/API/đầu vào. Khi bật QA,
+agent chỉ qua cổng khi báo cáo có `verdict=pass`, đúng stage và SHA-256
+khớp mọi đầu vào hiện tại. Sau sửa phải chạy lại những cổng bị ảnh hưởng.
+Lỗi API, từ chối, kết quả thiếu hoặc chưa đủ bằng chứng đều chặn bàn giao;
+không tự retry request có trạng thái chưa rõ, không đổi model ngầm.
+
+Đây là cổng trong quy trình do agent thực hiện; các lệnh render/mux chạy
+riêng không tự gọi QA. Vision chỉ xác nhận các ảnh đã xem, không chứng nhận
+mọi frame hay audio. Agent vẫn nghe lời đọc, kiểm tra đồng bộ thực tế và
+kiểm chứng phép tính bằng code trước khi giao.
 
 ## Trách nhiệm của agent
 
@@ -163,7 +221,7 @@ Chỉ fallback sang muse-image sau khi API hết lựa chọn vì lỗi cho phé
 Mọi skill đọc global trước, project ghi đè từng giá trị; thiếu cấu hình thì dừng và báo người dùng bổ sung, không chuyển tầng vì thiếu cấu hình.
 Giữ nguyên prompt và yêu cầu ảnh. Lỗi đầu vào phải sửa; từ chối an toàn hoặc
 job chưa rõ trạng thái phải dừng, không tự gửi lại. Hết tầng thì cover pending,
-không thay bằng frame video. `.env.math` chỉ chứa thư mục đầu ra.
+không thay bằng frame video. `.env.math` chứa thư mục đầu ra và cấu hình QA riêng nếu cần.
 
 Agent phải gọi built-in trước. Khi đã xác minh built-in không có/không khả dụng,
 có thể chạy fallback cho cover mới (không có ảnh tham chiếu):

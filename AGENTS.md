@@ -100,5 +100,5 @@ Report progress in the user's language. If a step fails, read the error, fix the
 - tools/film_image.py implements API → Muse for new images only. The agent must handle the built-in tier first and supply --builtin-unavailable with a verified reason. Use the skills directly for reference images or editing.
 - --dry-run makes no network calls and reports configuration issues. --cover normalizes output to PNG at 1280x720 under 2 MB. Inspect the actual image before accepting it.
 - Keep code-native style artwork when required by STYLE.md.
-- Shared project settings belong in .env. For math films, read MATH-VIDEOS.md; .env.math contains only OUTPUT_DIR. Set LEMO_ENV_FILE=.env.math so core loads shared settings and overrides the output directory.
+- Shared project settings belong in .env. For math films, read MATH-VIDEOS.md; .env.math contains OUTPUT_DIR and optional AI_QA_* overrides. Follow MATH-VIDEOS.md for conditional vision QA; only AI_QA_REQUIRED=true enables it. Pass output paths explicitly to core tools that do not load .env.math.
 - tools/math_cover.py is a compatibility entry point with --cover and the same built-in prerequisite.
