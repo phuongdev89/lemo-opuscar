@@ -13,6 +13,18 @@ Vì là phim của người dùng (ngoài `styles/`), phim toán **không có cr
 LemoLab**; watermark logo kênh Toán được chèn ở bước mux theo mục
 "Logo / watermark kênh".
 
+## Cấu trúc đầu ra bắt buộc
+
+Áp dụng [OUTPUT-STRUCTURE.md](OUTPUT-STRUCTURE.md): root chỉ có `cover.png`,
+`calendar.json`, một MP4 cuối, `preview.html`, `report.html`, `qa.html` và thư
+mục con. Mọi đề/lời giải, treatment, HTML nguồn, script, audio, file dựng,
+`upload.md`, manifest và bằng chứng QA nằm bên trong (mặc định `project/`).
+Các ví dụ tên file bên dưới hiểu là file bên trong project/ trừ sáu file root.
+report.html bắt buộc có lịch sử làm việc và tổng kết; qa.html có toàn bộ
+trao đổi QA thật, kể cả các lần fail và cách xử lý, không chỉ verdict cuối.
+Công cụ hiện ghi snapshot JSON; agent phải lưu từng lượt request/response
+và dựng hai trang báo cáo theo hợp đồng, không coi snapshot là lịch sử đủ.
+
 ## Cấu hình riêng cho video toán
 
 Cấu hình dịch vụ dùng chung nằm trong `.env` tại root repository. `.env.math`
@@ -30,17 +42,23 @@ Công cụ core hiện đọc `.env` và không tự đọc `.env.math`; truyề
 
 ## QA vision có điều kiện — bắt buộc khi AI_QA_REQUIRED=true
 
-Agent áp dụng hai cổng kiểm tra bằng `tools/math_qa.py`:
+Agent áp dụng hai cổng bằng `tools/math_qa.py`, không lặp QA nội dung sau MP4:
 
-1. `assets`: sau khi có đề gốc, lời giải, lời thoại và ảnh tài nguyên thật,
-   trước khi dựng/render toàn bộ video.
-2. `final`: sau khi mux và sinh cover, trước khi ghi `calendar.json` và bàn giao.
-   Lấy khung hình từ MP4 cuối bằng FFmpeg, ở mỗi bước giải, trước/sau chuyển
-   cảnh và lúc hiện đáp án; đưa cả cover vào bộ kiểm tra. Gắn timestamp giây
-   thật và ghi rõ cover trong nhãn. Nếu nhiều hơn 40 ảnh, chia thành nhiều
-   manifest/batch, chạy và lưu báo cáo từng batch riêng; tất cả phải đạt.
+1. **`assets` — toàn bộ QA nội dung trước render MP4.** Gửi đề gốc, lời giải,
+   lời thoại có timeline, tài nguyên và ảnh render trực tiếp bằng code của
+   phim tại từng bước giải, lúc chữ hiện đầy đủ, trước/sau đổi bố cục và lúc
+   công bố đáp án. Không chỉ kiểm tra ảnh rời mà bỏ qua cảnh đã dàn trang.
+   Kiểm tra toán học, số/nhãn, minh họa, độ đọc được, tràn/chồng chữ, style,
+   mức độ giải thích và lộ đáp án. Kiểm tra âm thanh/nhịp đọc từ WAV trước
+   render, không chờ MP4. Sửa và duyệt xong mới render toàn bộ video.
+2. **`final` — sau MP4 chỉ kiểm tra vị trí logo kênh.** Công cụ tự trích
+   khung hình từ MP4 sau mux theo timestamp của từng bố cục, gửi ảnh và ID/
+   timestamp với prompt ngắn riêng. Không đọc/gửi lại đề, lời giải, lời thoại,
+   không yêu cầu giải lại toán hay QA lại bố cục ngoài vùng ảnh hưởng logo.
+   Kiểm tra logo hiện đủ, nằm trong khung và không che nội dung. Sửa logo
+   chỉ chạy lại cổng này; sửa nội dung quay lại QA assets phần bị thay đổi.
 
-Tạo manifest trong thư mục phim (đường dẫn tương đối với manifest):
+Manifest `qa-input-assets.json` (mọi đường dẫn tương đối với manifest):
 
 ```json
 {
@@ -50,35 +68,64 @@ Tạo manifest trong thư mục phim (đường dẫn tương đối với manif
   "solution": "solution.md",
   "narration": "narration-timeline.md",
   "images": [
-    {"path": "qa/frame-12.png", "timestamp": 12, "label": "Đọc đề"},
-    {"path": "cover.png", "timestamp": 0, "label": "Cover, không phải frame video"}
+    {"path": "preview/scene-2.png", "timestamp": 12, "label": "Đọc đề"}
   ]
 }
 ```
 
-`problem.md` giữ nguyên đề và dữ kiện gốc; đề dạng ảnh phải được đưa vào bộ
-ảnh `assets` để đối chiếu bản chép. `narration-timeline.md` ghi lời thoại kèm
-mốc bắt đầu/kết thúc thật. Manifest final dùng khung hình mới trích từ bản
-render cuối, không lấy lại ảnh preview. Tách manifest assets và final.
+`problem.md` giữ nguyên đề; nếu có ảnh đề gốc thì đưa vào assets để đối chiếu
+bản chép. Ảnh preview phải từ code và nội dung thực tế dùng cho render.
+Manifest `qa-input-final.json` chỉ cần:
 
-```powershell
-python tools/math_qa.py --manifest films/<phim>/qa-input-assets.json --stage assets --dry-run
-python tools/math_qa.py --manifest films/<phim>/qa-input-assets.json --stage assets
-python tools/math_qa.py --manifest films/<phim>/qa-input-final.json --stage final
+```json
+{
+  "video": "final.mp4",
+  "images": [
+    {"path": "scene-2", "timestamp": 12},
+    {"path": "scene-3", "timestamp": 28}
+  ]
+}
 ```
 
-Báo cáo `qa-assets.json` / `qa-final.json` được ghi cạnh manifest. Dùng tên
-manifest `qa-input-assets.json` và `qa-input-final.json`. Mã thoát: 0 = đạt hoặc QA tắt,
-1 = không đạt/chưa đủ bằng chứng, 2 = lỗi cấu hình/API/đầu vào. Khi bật QA,
-agent chỉ qua cổng khi báo cáo có `verdict=pass`, đúng stage và SHA-256
-khớp mọi đầu vào hiện tại. Sau sửa phải chạy lại những cổng bị ảnh hưởng.
-Lỗi API, từ chối, kết quả thiếu hoặc chưa đủ bằng chứng đều chặn bàn giao;
-không tự retry request có trạng thái chưa rõ, không đổi model ngầm.
+Ở final, `path` là ID duy nhất, không cần có ảnh sẵn. Công cụ trích ảnh vào
+`qa-extracted-final/` và lưu SHA-256 MP4 cùng các đầu vào. Không đưa cover
+vào final. Cover sinh sau video theo quy tắc cover, kiểm tra riêng bằng
+assets với một manifest chỉ chứa cover; không gửi lại ảnh các cảnh đã duyệt.
+Việc sinh cover sau video không làm QA nội dung video phải chạy lại.
 
-Đây là cổng trong quy trình do agent thực hiện; các lệnh render/mux chạy
-riêng không tự gọi QA. Vision chỉ xác nhận các ảnh đã xem, không chứng nhận
-mọi frame hay audio. Agent vẫn nghe lời đọc, kiểm tra đồng bộ thực tế và
-kiểm chứng phép tính bằng code trước khi giao.
+```powershell
+python tools/math_qa.py --manifest films/<phim>/project/qa-input-assets.json --stage assets --dry-run
+python tools/math_qa.py --manifest films/<phim>/project/qa-input-assets.json --stage assets
+python tools/math_qa.py --manifest films/<phim>/project/qa-input-final.json --stage final
+```
+
+Báo cáo `qa-assets.json` / `qa-final.json` ghi cạnh manifest, có `scope` lần
+lượt `content-and-layout` / `logo-only`. Mỗi batch (tối đa 40 ảnh) đặt trong
+thư mục riêng và giữ nguồn cần thiết trong thư mục đó, không ghi đè báo cáo
+batch khác; tất cả phải đạt. Không tự bỏ ảnh để giảm token. Chỉ gửi ảnh đại
+diện cho từng bố cục/thay đổi có ý nghĩa, không gửi lặp frame giống hệt nhau.
+
+Mã thoát: 0 = đạt hoặc QA tắt, 1 = không đạt/chưa đủ bằng chứng, 2 = lỗi.
+Khi bật QA, chỉ qua cổng khi verdict=pass, đúng stage/scope và hash khớp đầu
+vào hiện tại. Thiếu cấu hình/API lỗi/từ chối/chưa đủ bằng chứng đều chặn;
+không retry job chưa rõ trạng thái hoặc đổi model ngầm. Khi QA tắt hoàn toàn
+không gọi API. Đây là cổng do agent thực hiện; render/mux riêng không tự gọi.
+
+### Quy tắc logo bắt buộc
+
+- Logo che bất kỳ chữ nào là **blocker**, kể cả tên kênh/badge/header; áp
+  dụng cả số, đơn vị, nhãn điểm, sơ đồ và vật thể đang dùng để giảng. Không
+  đoán chữ sau logo rồi coi là đọc được; logo không được lấn vùng bài giảng.
+- Mỗi ảnh final phải có `image_checks` đúng ID và mục `logo_overlap` chứa
+  status/evidence cụ thể về vị trí và nội dung lân cận. Logo thiếu, cắt mép,
+  che nội dung hoặc không phán đoán được đều không đạt. Final không yêu cầu
+  `independent_solution` hay `readability` cho toàn khung.
+- Assets vẫn yêu cầu kiểm tra độ đọc được toàn ảnh và logo nếu đã có trong
+  preview. Không đòi preview trước mux phải có logo; final kiểm tra logo thật.
+- Khi dời/thu logo: mux lại từ video sạch, không chèn đè lên bản đã có logo.
+  Giữ bản cũ để đối chiếu. Mỗi bố cục cần ảnh final đại diện, không suy từ một
+  cảnh rằng logo an toàn cho toàn phim. Không tuyên bố đã có kiểm tra giao
+  bounding box bằng code: công cụ hiện chưa thu thập các box này tự động.
 
 ## Mặc định cố định cho mọi video Toán
 
@@ -320,7 +367,7 @@ do, **nguyên văn prompt** và provider đã dùng thật (`muse-image` hay
 
 ## Tiêu đề, mô tả, caption khi đăng (`upload.md`)
 
-Làm cùng lúc với cover: viết file `upload.md` trong thư mục phim, tiếng Việt,
+Làm cùng lúc với cover: viết file `project/upload.md` trong thư mục phim, tiếng Việt,
 sẵn sàng copy-paste khi đăng. Mọi câu chữ bám **nội dung thật** của phim (đề,
 `solution.md`); không bịa nguồn, số liệu, đáp án.
 

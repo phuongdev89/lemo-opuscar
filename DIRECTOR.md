@@ -42,7 +42,7 @@ The benchmark lifts quality more than any rule below.
 
 ## 4. Write the treatment
 
-Write `TREATMENT.md` before drawing anything, and before you open the style's `DEMO.md` or demo code (an Edit & Documentary style gathers its material first: AGENTS.md, "Treatment first"):
+Write `project/TREATMENT.md` before drawing anything, and before you open the style's `DEMO.md` or demo code (an Edit & Documentary style gathers its material first: AGENTS.md, "Treatment first"):
 
 1. **Three candidate structures**, a few lines each (for example: a single journey, a before/after, a countdown, a list that turns), then the one you chose and why. Choose the opening image, the ending and the shape of the score from the topic too; the first idea that comes to mind for a style is usually its cliché.
 2. **Logline and arc**: one sentence, then setup → turn → ending.
@@ -120,13 +120,7 @@ Render 6–9 key shots with the real drawing code, tiled into one sheet (`core/r
 - Every row of the sound design table is actually in the mix.
 - No LemoLab sign-off: `grep -rniE "lemo ?lab|opus 5\.5" <project folder>` finds nothing outside `LICENSE`, `CREDITS` and the library's path in `LIB=` lines, and you have watched the last seconds of the film (text drawn into an image can't be grepped).
 
-**Deliver**, in the project folder (the complete list):
-
-- `<name>.mp4` (24 fps unless `STYLE.md` sets another rate, about −14 LUFS) and `poster.jpg`;
-- `<name>.srt`, when the film has narration, dialogue or subtitles;
-- `TREATMENT.md`;
-- `CREDITS`: every third-party asset in the film (sample libraries, music, fonts, images, the voice engine) with its source and licence (TECHNIQUE.md §11);
-- the source, with a one-command `build.sh` (TECHNIQUE.md §2).
+**Deliver** according to [OUTPUT-STRUCTURE.md](OUTPUT-STRUCTURE.md): the film root has only cover.png, calendar.json, one final MP4, preview.html, report.html and qa.html, plus production subfolders. Keep treatment, source, build scripts, CREDITS, subtitles (when applicable) and intermediate outputs under project/. report.html includes work history, final summary, publishing copy and links to sources/licences; qa.html preserves actual QA exchanges. Math films follow their no-subtitle and audio rules.
 
 **Tell the user**, in their language: where the project folder and the film are; that `CREDITS` lists the third-party assets in the film and their licences; and that they are responsible for the materials they use in it.
 

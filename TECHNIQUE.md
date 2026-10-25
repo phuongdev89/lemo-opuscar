@@ -32,6 +32,8 @@ A synthesized score needs no big download; `sampler.py` names the library to fet
 
 ## 2. The picture is a function of time
 
+**Output paths:** [OUTPUT-STRUCTURE.md](OUTPUT-STRUCTURE.md) is authoritative for user films. The renderable page and build scripts live under `<film>/project/`; audio and intermediate outputs stay there. Only the final MP4, cover.png, calendar.json, preview.html, report.html and qa.html are files at the film root. Older `<demo>` examples describe the source directory, not the delivery root. Set LIB explicitly when nesting source; update all asset/mix/mux paths, and verify rebuild and preview after migration. Append real work and QA exchanges to internal logs for the two HTML reports; never expose credentials.
+
 Each film is a folder with an `index.html` (`<demo>` in the commands) that exposes:
 
 ```js
@@ -50,14 +52,14 @@ A `build.sh` that works in both modes (in skill mode, put `LIB=<path setup.sh pr
 #!/bin/sh
 set -e
 HERE=$(cd "$(dirname "$0")" && pwd)
-LIB=${LIB:-$(cd "$HERE/../.." && pwd)}          # clone mode: <repo>/films/<name>/
+LIB=${LIB:?set LIB to the absolute library root} # HERE may be <film>/project/
 export LIB
 [ -f "$LIB/core/render/video.mjs" ] || { echo "set LIB to the library folder"; exit 1; }
 cd "$LIB"
 node core/render/events.mjs "$HERE"
 node core/render/video.mjs "$HERE" --fps 24 --out "$HERE/out/video.mp4"
 "$LIB/.venv/bin/python" "$HERE/mix.py"                               # score, foley, voice → out/mix.wav
-sh core/render/mux.sh "$HERE/out/video.mp4" "$HERE/out/mix.wav" "$HERE/<name>.mp4" 24
+sh core/render/mux.sh "$HERE/out/video.mp4" "$HERE/out/mix.wav" "$HERE/../<name>.mp4" 24
 ```
 
 Rules that keep it reliable:

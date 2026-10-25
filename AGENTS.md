@@ -75,7 +75,7 @@ All 59 styles · 全部风格:
    - anything missing on their machine: first run `sh plugin/skills/lemo-opuscar/scripts/setup.sh deps` from the library root (core only) and include what it reports. Add the voice and music tiers later, only if the film needs them (TECHNIQUE.md §1).
 
    Skip what their request already answers. Wait for the reply, fill every other gap with a sensible default, sum up the brief in a few lines and start. Don't come back with more questions.
-2. **Treatment.** Write `TREATMENT.md` in the project folder (DIRECTOR.md §4), before you open the demo (an Edit & Documentary style gathers its material first: **Treatment first** above).
+2. **Treatment.** Write `project/TREATMENT.md` in the film folder (DIRECTOR.md §4), before you open the demo (an Edit & Documentary style gathers its material first: **Treatment first** above).
 3. **Look.** Render style frames or a model sheet with the real drawing code and check them against `STYLE.md` (DIRECTOR.md §5).
 4. **Storyboard, only if the user asked for it** (DIRECTOR.md §5). **Stop and wait for approval.** Otherwise don't stop.
 5. **Produce.** Voice → check → score (can run in parallel) → animation → mix → render (TECHNIQUE.md).
@@ -84,6 +84,8 @@ All 59 styles · 全部风格:
 Report progress in the user's language. If a step fails, read the error, fix the cause and retry; go back to the user only for a decision or something only they can provide.
 
 ## Where things go
+
+- **Output contract:** read [OUTPUT-STRUCTURE.md](OUTPUT-STRUCTURE.md). At the film root keep only cover.png, calendar.json, one final MP4, preview.html, report.html and qa.html. Put source, treatment, credits, upload text, audio, intermediate builds and QA evidence in subfolders (default project/). report.html must retain work history and the final summary; qa.html must retain actual QA exchanges. This overrides older flat-folder examples in all guides.
 
 - The film's project folder defaults to `<OUTPUT_DIR>/<name>/` (by default `films/<name>/`, configurable via `OUTPUT_DIR` in `.env`), or `<name>/` in the user's folder in skill mode (see the skill's `SKILL.md`). Wherever a guide says `films/<name>/`, read "the project folder". Work only there, unless the user asks you to work in their own project.
 - Name the project folder `<yyyy-mm-dd>_<slug>/`: the date the folder is created, then `_`, then a short kebab-case slug of the film's topic — e.g. `films/2026-10-24_bai-toan-xe-buyt/`. If the name is already taken, append `-2`, `-3`… to the slug; keep the date prefix.
