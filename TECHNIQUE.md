@@ -14,6 +14,13 @@ mix (duck, compress, balance) ──► mux with ffmpeg, two-pass loudnorm −14
 
 ## 1. Requirements and install
 
+Production is bounded by [PRODUCTION-EFFICIENCY.md](PRODUCTION-EFFICIENCY.md):
+use existing styles and tools, log every command and complete output through
+`python tools/film_run.py --film <output> --phase <phase> -- <command>`, and
+do not rebuild the toolchain to make a film. Diagnose a shared-tool failure
+locally for at most two fixes or ten active minutes before taking a known
+working path or reporting a concrete blocker.
+
 System tools, which the user installs: **Node 20+**, **ffmpeg**, and **Python 3.11+** or [uv](https://docs.astral.sh/uv/). Developed on macOS (Apple silicon); Linux should work; on Windows use WSL. 3D and shader-heavy styles want a GPU.
 
 Everything else installs in tiers, from the library root (`$LIB` in skill mode). Install a tier only when the film needs it:

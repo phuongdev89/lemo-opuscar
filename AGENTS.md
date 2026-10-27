@@ -34,6 +34,9 @@ This repository is a library of film styles. Each style has a `styles/<slug>/STY
 
 ## Style and story
 
+- **Production uses existing styles only.** Select an existing library style or an already-existing user style. Never create, register, fork, rename or code a new style during film production, including to bypass a QA rejection. User math requirements take priority over demo defaults. If the remaining visual invariants conflict, select another existing compatible style. New-style work requires a separate explicit user request; this production rule overrides the style-creation routes below.
+- **Keep production bounded.** Follow `PRODUCTION-EFFICIENCY.md` for full command/output logging, short planning, targeted QA, tool-repair limits and actual timing. Do not turn a film request into tool development or repeatedly rebuild the production stack.
+
 - **`STYLE.md` is fixed**: the style's invariants (look, colour, type, motion, camera grammar, sound palette, native moves, pitfalls). Keep all of it.
 - **Everything else is yours to direct** from the user's topic: story, structure, characters, settings, shots, timings, references, how data is charted. Never bend the topic toward the demo.
 - **Treatment first, demo later.** Write your own `TREATMENT.md`, with three candidate structures and your choice (DIRECTOR.md §4), before you open `DEMO.md` or the demo code. Then use the demo only to learn techniques (a brush engine, a rig, a shader, a mix), never its story, arc, shots, props or timeline. One exception: a style cut from real material (Edit & Documentary) needs its material before the treatment, so the tools its `STYLE.md` names in `demo/tools/` for finding and logging material (`footage.py` and the like) may be used first, copied into the project folder and run there; still read `DEMO.md` and the rest of the demo only after the treatment is written.

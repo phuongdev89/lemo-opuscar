@@ -15,6 +15,11 @@ LemoLab**; watermark logo kênh Toán được chèn ở bước mux theo mục
 
 ## Cấu trúc đầu ra bắt buộc
 
+Áp dụng [PRODUCTION-EFFICIENCY.md](PRODUCTION-EFFICIENCY.md): chỉ dùng style
+có sẵn, cấm code thêm style/biến thể; giữ đầy đủ lệnh và output thật, giới
+hạn sửa công cụ, QA phần thay đổi và đo thời gian từng công đoạn. Quy tắc
+này ưu tiên hơn ví dụ/demo về tạo style hoặc xây lại công cụ.
+
 Áp dụng [OUTPUT-STRUCTURE.md](OUTPUT-STRUCTURE.md): root chỉ có `cover.png`,
 `calendar.json`, một MP4 cuối, `preview.html`, `report.html`, `qa.html` và thư
 mục con. Mọi đề/lời giải, treatment, HTML nguồn, script, audio, file dựng,
@@ -22,8 +27,10 @@ mục con. Mọi đề/lời giải, treatment, HTML nguồn, script, audio, fil
 Các ví dụ tên file bên dưới hiểu là file bên trong project/ trừ sáu file root.
 report.html bắt buộc có lịch sử làm việc và tổng kết; qa.html có toàn bộ
 trao đổi QA thật, kể cả các lần fail và cách xử lý, không chỉ verdict cuối.
-Công cụ hiện ghi snapshot JSON; agent phải lưu từng lượt request/response
-và dựng hai trang báo cáo theo hợp đồng, không coi snapshot là lịch sử đủ.
+Công cụ QA giữ từng lượt trong `qa/<id>/` cạnh manifest, gồm request (ảnh
+tham chiếu bằng hash), response nhận được, manifest và result; JSON cạnh
+manifest chỉ là snapshot mới nhất. Agent bổ sung lịch sử sửa, liên kết ảnh
+và dựng hai trang báo cáo theo hợp đồng; không coi snapshot là lịch sử đủ.
 
 ## Cấu hình riêng cho video toán
 

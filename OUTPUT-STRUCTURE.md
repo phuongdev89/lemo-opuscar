@@ -76,6 +76,15 @@ Ngoài cùng chỉ có đúng sáu tệp sau, cộng thư mục con phục vụ 
 
 ## report.html — lịch sử làm việc và báo cáo tổng kết
 
+Tuân thủ [PRODUCTION-EFFICIENCY.md](PRODUCTION-EFFICIENCY.md). **Lịch sử đầy
+đủ không phải bản tóm tắt do agent viết lại:** phải lưu mọi lệnh, cwd, thời
+gian thật, exit code và toàn bộ stdout/stderr (che secret), kể cả lệnh thất
+bại. Dùng `tools/film_run.py` hoặc logger tương đương ngay từ đầu. Trang
+report liệt kê tất cả lượt chạy và liên kết transcript HTML/output đầy đủ
+trong `project/logs/commands/`; không truncate hoặc thay output bằng mô tả.
+Lưu cả hành động/tool ngoài shell và kết quả thực; ghi rõ phần host không
+cho xuất. Lịch sử là dữ liệu thực thi, không yêu cầu suy nghĩ nội bộ model.
+
 Một trang HTML UTF-8 đọc được bằng trình duyệt, không cần thư viện/CDN bên
 ngoài. Cập nhật trong quá trình làm, không chỉ tạo bản tóm tắt lúc bàn giao.
 

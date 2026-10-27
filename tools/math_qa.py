@@ -7,6 +7,8 @@ import mimetypes
 import os
 import ssl
 import subprocess
+from datetime import datetime, timezone
+import uuid
 from pathlib import Path
 import urllib.error
 import urllib.request
@@ -264,6 +266,13 @@ def request_review(config, content):
     payload = {'model': config['AI_QA_MODEL'], 'messages': [
         {'role': 'system', 'content': {'style': STYLE_SYSTEM, 'final': LOGO_SYSTEM}.get(stage, SYSTEM)}, {'role': 'user', 'content': content}],
         'response_format': {'type': 'json_object'}}
+    audit = config.get('_audit_dir')
+    if audit:
+        logged = json.loads(json.dumps(payload))
+        for item in logged['messages'][1]['content']:
+            if item.get('type') == 'image_url':
+                item['image_url']['url'] = '[local image: see inputs_sha256 in result.json]'
+        (audit / 'request.json').write_text(json.dumps(logged, ensure_ascii=False, indent=2), encoding='utf-8')
     request = urllib.request.Request(url + '/chat/completions',
         data=json.dumps(payload).encode(), headers={
             'Authorization': 'Bearer ' + config['AI_QA_KEY'],
@@ -277,7 +286,10 @@ def request_review(config, content):
         pass
     try:
         with urllib.request.urlopen(request, timeout=180, context=context) as response:
-            data = json.load(response)
+            raw_response = response.read().decode('utf-8')
+        if audit:
+            (audit / 'response.txt').write_text(raw_response.replace(config['AI_QA_KEY'], '[REDACTED]'), encoding='utf-8')
+        data = json.loads(raw_response)
     except urllib.error.HTTPError as error:
         raise RuntimeError(f'QA HTTP {error.code}; no automatic retry') from None
     except (OSError, ValueError):
@@ -309,11 +321,23 @@ def main(argv=None):
         return 0
     # Remove any old approval before validating this new run.
     out = args.manifest.resolve().parent / f'qa-{args.stage}.json' if args.manifest else None
+    audit = None
     try:
         if args.manifest and out == args.manifest.resolve():
             raise ValueError('Manifest must not use the reserved report filename')
         if out and not args.dry_run:
+            # Immutable attempts; the adjacent report remains only a latest snapshot.
+            audit = out.parent / 'qa' / (datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S') + '-' + uuid.uuid4().hex)
+            audit.mkdir(parents=True)
+            if out.exists():
+                (audit / 'previous-snapshot.json').write_bytes(out.read_bytes())
+            config = dict(config, _audit_dir=audit)
+            (audit / 'attempt.json').write_text(json.dumps({
+                'started_at': datetime.now(timezone.utc).isoformat(), 'stage': args.stage,
+                'manifest': args.manifest.name, 'model': config.get('AI_QA_MODEL'),
+                'status': 'started'}, indent=2), encoding='utf-8')
             out.write_text(json.dumps({'verdict': 'error', 'stage': args.stage}), encoding='utf-8')
+            (audit / 'manifest.json').write_bytes(args.manifest.read_bytes())
         missing = [k for k in ('AI_QA_URL', 'AI_QA_KEY', 'AI_QA_MODEL') if not config.get(k, '').strip()]
         if missing:
             raise ValueError('Missing configuration: ' + ', '.join(missing))
@@ -334,6 +358,13 @@ def main(argv=None):
         message = str(error) if isinstance(error, (ValueError, RuntimeError)) and not isinstance(error, json.JSONDecodeError) else type(error).__name__
         print(f'QA blocked: {message}')
         return 2
+    finally:
+        if audit is not None:
+            if out.exists():
+                (audit / 'result.json').write_bytes(out.read_bytes())
+            attempt = json.loads((audit / 'attempt.json').read_text(encoding='utf-8'))
+            attempt.update(ended_at=datetime.now(timezone.utc).isoformat(), status='finished')
+            (audit / 'attempt.json').write_text(json.dumps(attempt, indent=2), encoding='utf-8')
 
 
 if __name__ == '__main__':
