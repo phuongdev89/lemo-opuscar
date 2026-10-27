@@ -58,8 +58,14 @@ Agent áp dụng ba cổng bằng `tools/math_qa.py`, không lặp QA nội dung
    QA góp ý cụ thể về mức phù hợp, invariants, độ đọc được, diễn giải sư phạm,
    chuyển động và vùng logo; không đợi ảnh mới bắt đầu trao đổi.
    Agent sửa các mục blocker/fix và gửi lại kế hoạch để đạt trước khi sản xuất;
-   nếu đổi style phải tham vấn lại. Suggestion không áp dụng phải ghi lý do.
-   Không sửa invariants để ép style không phù hợp. Đây là duyệt kế hoạch,
+   nếu người dùng đồng ý đổi style phải tham vấn lại. Suggestion không áp dụng phải ghi lý do.
+   QA phải giữ lựa chọn style của người dùng và xét đặc tả đã áp dụng các
+   override của phim. Nhạc, SFX, giọng và phụ đề lời thoại là cấu hình độc lập,
+   kể cả khi STYLE.md gọi chúng là bất biến; bỏ chúng không làm mất style,
+   không phải tạo biến thể và không được đánh blocker/fix chỉ vì bỏ chúng.
+   Giữ bản sắc thị giác (ví dụ Crayon: sáp, vân giấy, nét tô và chuyển động vẽ tay).
+   Nếu còn xung đột thị giác thực sự, agent nêu rõ để người dùng quyết định;
+   QA không có quyền cho phép tự chuyển style. Đây là duyệt kế hoạch,
    không chứng nhận hình/audio thực tế. Lưu từng lượt và quyết định vào qa.html.
 
 1. **`assets` — toàn bộ QA nội dung trước render MP4.** Gửi đề gốc, lời giải,
@@ -69,6 +75,17 @@ Agent áp dụng ba cổng bằng `tools/math_qa.py`, không lặp QA nội dung
    Kiểm tra toán học, số/nhãn, minh họa, độ đọc được, tràn/chồng chữ, style,
    mức độ giải thích và lộ đáp án. Kiểm tra âm thanh/nhịp đọc từ WAV trước
    render, không chờ MP4. Sửa và duyệt xong mới render toàn bộ video.
+   Mỗi ảnh phải có riêng năm kiểm tra: `logo_overlap`, `readability`,
+   `glyph_integrity` (dấu tiếng Việt, glyph thiếu/lỗi hoặc thay thế),
+   `font_consistency` (trộn nét/font ngoài chủ đích trong cùng từ/vai trò chữ),
+   `text_overlap` (chữ chạm/chồng chữ, hình, chấm, nét hoặc bị cắt mép).
+   “Vẫn đọc được” không đủ để PASS khi còn các lỗi này. Khác font có chủ đích
+   giữa tiêu đề, nhãn và công thức không tự động là lỗi. Gửi cả khung đầy đủ
+   và crop nguyên độ phân giải cho vùng chữ nhỏ/cảnh đáp án; crop không thay
+   thế kiểm toàn khung. Thiếu chi tiết phải ghi insufficient_evidence.
+   Agent tự xem ảnh và giải quyết lỗi nhìn thấy dù model báo PASS. Sau QA,
+   thay đổi nguồn/nội dung làm hết hiệu lực nghiệm thu phần liên quan;
+   không ghi PASS cố định trong script báo cáo.
 2. **`final` — sau MP4 chỉ kiểm tra vị trí logo kênh.** Công cụ tự trích
    khung hình từ MP4 sau mux theo timestamp của từng bố cục, gửi ảnh và ID/
    timestamp với prompt ngắn riêng. Không đọc/gửi lại đề, lời giải, lời thoại,
@@ -166,8 +183,10 @@ không gọi API. Đây là cổng do agent thực hiện; render/mux riêng kh�
 
 ## Mặc định cố định cho mọi video Toán
 
-Các yêu cầu sau ghi đè mặc định âm thanh/phong cách trong DIRECTOR.md,
-TECHNIQUE.md và demo. Không hỏi lại ở mỗi phim, chỉ đổi khi người dùng
+Các yêu cầu sau ghi đè mặc định âm thanh/phong cách trong STYLE.md, DIRECTOR.md,
+TECHNIQUE.md và demo. Nhạc, SFX và phụ đề lời thoại có thể tắt độc lập ở mọi
+style; giữ style người dùng chọn, không tự thay bằng neon/Dark Keynote hay
+style khác vì các mặc định này. Không hỏi lại ở mỗi phim, chỉ đổi khi người dùng
 chỉ định rõ ngoại lệ cho phim đó.
 
 - **Giọng duy nhất: Minh Quân Pro**, preset VieNeu-TTS v3 Turbo. Truyền
@@ -190,12 +209,13 @@ chỉ định rõ ngoại lệ cho phim đó.
   Bỏ bước tạo score/foley/SFX và mọi audio track từ demo; mix chỉ có lời đọc
   và khoảng lặng. Không sinh nhạc rồi chỉ giảm volume. Nghe MP4 cuối để xác
   nhận không sót track âm thanh phụ.
-- **Không dùng style giấy trắng hoặc bảng trắng** cho Toán: loại
+- **Mặc định không đề xuất bố cục giấy trắng hoặc bảng trắng** cho Toán: tránh
   `whiteboard` (Whiteboard Explainer), bố cục tờ giấy trắng/worksheet,
   trang vở trắng và slide nền trắng mô phỏng giấy/bảng trắng. Không đề xuất
-  các hướng này khi chọn style. Nếu style đã chọn bắt buộc hình thức đó,
-  chọn style khác phù hợp, không sửa invariants của STYLE.md. Giấy màu và
-  các style khác chỉ được dùng khi không trở lại bố cục giấy/bảng trắng.
+  các hướng này khi tự chọn style. Lựa chọn rõ ràng của người dùng được ưu tiên;
+  không tự đổi style đã chọn. Vân giấy ngà của Crayon hay chất liệu giấy nghệ
+  thuật không tự động đồng nghĩa worksheet/bảng trắng: xét hình thực tế,
+  độ đọc được và cách trình bày. Nêu xung đột thực sự để người dùng quyết định.
 
 QA vision phải kiểm tra ảnh thật có vi phạm nền giấy/bảng trắng, bước giải
 bị nhảy hoặc thiếu minh họa không. Giọng, độ chậm, nhạc và SFX cần agent

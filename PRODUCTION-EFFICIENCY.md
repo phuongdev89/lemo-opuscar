@@ -7,9 +7,12 @@
 - Chỉ chọn trong thư viện hoặc style riêng đã tồn tại trước lượt sản xuất.
   Cấm tạo, fork, đăng ký, đổi tên hoặc code thêm style trong lúc làm phim;
   kể cả tạo biến thể để vượt QA. Không tự ghi vào `~/lemo-my-styles/`.
-- Yêu cầu người dùng về giọng, âm thanh, phụ đề và nền ưu tiên hơn demo.
-  Không tranh luận nhiều lượt để giữ mặc định demo trái yêu cầu. Nếu bất
-  biến thị giác vẫn không phù hợp, đổi sang style có sẵn tương thích.
+- Yêu cầu người dùng về giọng, âm thanh, phụ đề và nền ưu tiên hơn cả
+  `STYLE.md` và demo. Nhạc, SFX, giọng và phụ đề lời thoại là cấu hình độc lập;
+  bỏ hoặc thay chúng không phải tạo style mới và không phải lý do QA đánh trượt.
+  Giữ chất liệu, nét vẽ, màu sắc và chuyển động đặc trưng của style đã chọn.
+  Không tự đổi style người dùng chọn để vượt QA. Nếu có xung đột thị giác
+  thực sự chưa giải quyết được, trình bày cụ thể để người dùng quyết định đổi.
 - Code nội dung/hoạt cảnh của phim theo style đã chọn vẫn cần thiết;
   không biến việc này thành xây engine, thiết kế style mới hay viết lại renderer.
 - Không mặc định chọn bảng neon/HUD. Đề xuất tối đa ba style có sẵn, ưu tiên

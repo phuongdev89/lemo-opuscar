@@ -40,12 +40,27 @@ Ngoài cùng chỉ có đúng sáu tệp sau, cộng thư mục con phục vụ 
 
 ## Script riêng của phim và bản kế thừa công cụ
 
+- Kho đầu ra không phải thư viện tham khảo. Trong lúc sản xuất, cấm liệt kê,
+  quét, tìm kiếm, đọc hoặc lập chỉ mục `OUTPUT_DIR` và các phim khác, kể cả
+  phim đã hoàn thiện, để lấy code, script, tài nguyên, báo cáo hoặc QA cũ.
+  Chỉ truy cập đúng thư mục phim đang làm; được kiểm tra tồn tại của một tên
+  thư mục cụ thể để tránh trùng tên, không liệt kê kho đầu ra. Chỉ tham khảo
+  tài liệu/công cụ dùng chung và demo style theo quy trình của repository.
+  Cấm sao chép hoặc chạy script từ phim đã sản xuất. Khi người dùng yêu cầu
+  kiểm tra một phim cụ thể, phạm vi đọc chỉ mở cho phim được chỉ định.
+
 - Trong lúc sản xuất phim/video, mọi script chỉ phục vụ một lượt làm phim
   phải được viết ngay trong thư mục đầu ra của phim, bên trong thư mục con
   (mặc định `project/scripts/`). Áp dụng cho Python, CMD/BAT, PowerShell,
   shell, JS/TS và mọi ngôn ngữ khác, kể cả script tạm, thử nghiệm, kiểm tra,
-  sửa dữ liệu, build/mix/mux và dựng báo cáo. Không viết chúng trong project
-  chính, `tools/`, `.scratch/` của repository hoặc thư mục tạm ngoài phim.
+  sửa dữ liệu, build/mix/mux và dựng báo cáo. Quy tắc cũng áp dụng cho HTML
+  khôi phục, backup, file thử, file rác và mọi đầu ra trung gian. Không để
+  chúng ở root repository, `tools/` hoặc thư mục phim khác.
+- Nếu tệp tạm không thể lưu trong thư mục phim hiện tại, chỉ được lưu tại
+  `<library-root>/.scratch/<current-film-id>/`. Mỗi phim dùng một thư mục riêng;
+  không đọc/tái sử dụng scratch của phim khác, không dùng thư mục tạm khác.
+  Trước bàn giao, đưa các tệp cần để tái dựng hoặc làm bằng chứng QA về
+  `project/` của phim và ghi đường dẫn cùng lý do dùng scratch trong report.
 - Được gọi công cụ dùng chung hiện có mà không sửa nguồn; truyền đường dẫn
   để đầu ra/cache riêng của phim nằm trong phim khi công cụ hỗ trợ.
 - Nếu công cụ của project chính cần sửa mới chạy được: tạo lớp kế thừa,
