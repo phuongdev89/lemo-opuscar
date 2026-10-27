@@ -18,6 +18,8 @@ This repository is a library of film styles. Each style has a `styles/<slug>/STY
 
 **Math films:** follow `MATH-VIDEOS.md`: fixed Minh Quân Pro voice, slow and thorough explanations, no background music or sound effects, no white-paper/whiteboard styles. These user requirements override conflicting style/demo defaults; choose a compatible style.
 
+**Early math style consultation:** when `AI_QA_REQUIRED=true`, consult QA as soon as proposing/selecting a style, before finalizing the visual direction or producing images, TTS or animation. Use `tools/math_qa.py --stage style` with the original problem, grade/mode, full style specification and concrete design proposal. Resolve blocker/fix feedback before production and retain actual exchanges and agent decisions in qa.html. Planning approval does not replace later assets QA or final logo QA. See `MATH-VIDEOS.md`.
+
 ## Start
 
 - **Their own styles first.** If `~/lemo-my-styles/README.md` exists, read it: it lists every style the user has saved, wherever it's kept, and their own styles ([`MY-STYLES.md`](MY-STYLES.md)) count like library styles. When they name a style, look there first, then in the library.
@@ -91,6 +93,7 @@ Report progress in the user's language. If a step fails, read the error, fix the
 - Name the project folder `<yyyy-mm-dd>_<slug>/`: the date the folder is created, then `_`, then a short kebab-case slug of the film's topic — e.g. `films/2026-10-24_bai-toan-xe-buyt/`. If the name is already taken, append `-2`, `-3`… to the slug; keep the date prefix.
 - Run `node core/…` and `sh tools/…` from the library root (`$LIB` in skill mode).
 - `core/` has ready-made tools (rendering, TTS, speech check, sampler, sfx, mux). Use them or your own stack, but don't edit `core/` or `styles/` for a user's film.
+- **Film-specific scripts stay with the film.** During film/video production, write every one-off script (Python, CMD/BAT, PowerShell, shell, JS/TS or any other language), including temporary helpers and diagnostics, inside that film's output subfolders (default `project/scripts/`), never in the main repository, its `tools/`, or its scratch folders. Existing shared tools may be invoked unchanged with film-local outputs. If a shared tool needs modification to make the film work, inherit/wrap or copy it into the film output and modify that local version; do not patch the main project as part of production. Preserve provenance, dependencies and reproducible commands. In `report.html`, document the original file/version, local changes, reason, validation and a concrete proposed upstream fix for the user to review; do not apply that proposal without an explicit request to change the main project. See `OUTPUT-STRUCTURE.md`.
 - Never kill processes you didn't start. Don't leave background processes running.
 
 ## Shared skill configuration and image generation

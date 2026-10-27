@@ -44,6 +44,8 @@ window.EV = [{t, type, ...}];      // optional: sound / cue events for the mixer
 window.TEXTS = (t) => [{id, text, x0, y0, x1, y1}];   // optional: every text visible at t, for readcheck
 ```
 
+**One-off scripts:** write all production helpers inside the film output (default `project/scripts/`), including temporary/debug scripts. Invoke shared library tools unchanged. If a library tool needs a fix for this film, inherit/wrap or copy it into the film output and modify that local version; preserve dependencies and provenance. Record the changes, validation and proposed upstream fix in `report.html` for user review. Do not edit the main project during film production. See [OUTPUT-STRUCTURE.md](OUTPUT-STRUCTURE.md).
+
 **Paths:** pages reach library files with absolute URLs (`/core/lib.js`, `/node_modules/three/build/three.module.js`); scripts and `build.sh` use `$LIB`. Never `../..`.
 
 A `build.sh` that works in both modes (in skill mode, put `LIB=<path setup.sh printed>` at the top):

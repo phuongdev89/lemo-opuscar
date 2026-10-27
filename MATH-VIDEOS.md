@@ -42,7 +42,18 @@ Công cụ core hiện đọc `.env` và không tự đọc `.env.math`; truyề
 
 ## QA vision có điều kiện — bắt buộc khi AI_QA_REQUIRED=true
 
-Agent áp dụng hai cổng bằng `tools/math_qa.py`, không lặp QA nội dung sau MP4:
+Agent áp dụng ba cổng bằng `tools/math_qa.py`, không lặp QA nội dung sau MP4:
+
+0. **`style` — tham vấn QA ngay khi agent đề xuất/chọn style**, trước khi
+   chốt hướng hình ảnh, tạo ảnh, TTS hoặc dựng hoạt cảnh. Gửi đề, lớp, chế độ,
+   toàn văn `STYLE.md` và đề xuất của agent: lý do chọn, màu/nền/font, bố cục
+   hình/công thức, cách hiện từng bước, nhịp chuyển động và vùng dành cho logo.
+   QA góp ý cụ thể về mức phù hợp, invariants, độ đọc được, diễn giải sư phạm,
+   chuyển động và vùng logo; không đợi ảnh mới bắt đầu trao đổi.
+   Agent sửa các mục blocker/fix và gửi lại kế hoạch để đạt trước khi sản xuất;
+   nếu đổi style phải tham vấn lại. Suggestion không áp dụng phải ghi lý do.
+   Không sửa invariants để ép style không phù hợp. Đây là duyệt kế hoạch,
+   không chứng nhận hình/audio thực tế. Lưu từng lượt và quyết định vào qa.html.
 
 1. **`assets` — toàn bộ QA nội dung trước render MP4.** Gửi đề gốc, lời giải,
    lời thoại có timeline, tài nguyên và ảnh render trực tiếp bằng code của
@@ -57,6 +68,25 @@ Agent áp dụng hai cổng bằng `tools/math_qa.py`, không lặp QA nội dun
    không yêu cầu giải lại toán hay QA lại bố cục ngoài vùng ảnh hưởng logo.
    Kiểm tra logo hiện đủ, nằm trong khung và không che nội dung. Sửa logo
    chỉ chạy lại cổng này; sửa nội dung quay lại QA assets phần bị thay đổi.
+
+Manifest `qa-input-style.json` không cần ảnh, lời thoại hay audio. Sao chép
+STYLE.md đã chọn vào thư mục phim làm bằng chứng; proposal.md chứa đề xuất
+chi tiết nêu trên. Mọi đường dẫn tương đối với manifest:
+
+```json
+{
+  "mode": "answer",
+  "grade": "Lớp 5",
+  "problem": "problem.md",
+  "style": "style-spec.md",
+  "proposal": "style-proposal.md"
+}
+```
+
+Chạy `python tools/math_qa.py --manifest films/<phim>/project/qa-input-style.json --stage style`.
+Kết quả `qa-style.json` có scope `style-consultation`, đủ sáu tiêu chí và
+góp ý cụ thể. Cùng điều kiện bật/tắt, cấu hình, hash và quy tắc lưu lịch sử
+như hai cổng còn lại. Khi QA tắt, agent tự chọn style và ghi rõ không gọi QA.
 
 Manifest `qa-input-assets.json` (mọi đường dẫn tương đối với manifest):
 

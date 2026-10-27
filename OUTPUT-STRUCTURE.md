@@ -38,6 +38,32 @@ Ngoài cùng chỉ có đúng sáu tệp sau, cộng thư mục con phục vụ 
   trong project/ và liên kết từ report. Video Toán vẫn không tạo phụ đề.
 - Không để secret, `.env`, token hay thông tin xác thực vào trang HTML bàn giao.
 
+## Script riêng của phim và bản kế thừa công cụ
+
+- Trong lúc sản xuất phim/video, mọi script chỉ phục vụ một lượt làm phim
+  phải được viết ngay trong thư mục đầu ra của phim, bên trong thư mục con
+  (mặc định `project/scripts/`). Áp dụng cho Python, CMD/BAT, PowerShell,
+  shell, JS/TS và mọi ngôn ngữ khác, kể cả script tạm, thử nghiệm, kiểm tra,
+  sửa dữ liệu, build/mix/mux và dựng báo cáo. Không viết chúng trong project
+  chính, `tools/`, `.scratch/` của repository hoặc thư mục tạm ngoài phim.
+- Được gọi công cụ dùng chung hiện có mà không sửa nguồn; truyền đường dẫn
+  để đầu ra/cache riêng của phim nằm trong phim khi công cụ hỗ trợ.
+- Nếu công cụ của project chính cần sửa mới chạy được: tạo lớp kế thừa,
+  wrapper hoặc bản sao trong đầu ra phim rồi sửa bản cục bộ đó. Không sửa
+  trực tiếp nguồn dùng chung, demo hoặc cấu hình project chính để phục vụ
+  lượt sản xuất. Không để bản kế thừa ghi ngược thay đổi vào repository.
+- Giữ nguồn gốc: file gốc, revision Git hoặc hash nếu không có revision,
+  phần thay đổi, lý do và các phụ thuộc cần thiết. Sửa import/đường dẫn tài
+  nguyên cho đúng; ghi lệnh chạy thật để có thể tái dựng bằng bản cục bộ.
+- Trong `report.html`, bắt buộc có mục **Điều chỉnh công cụ và đề xuất cho
+  project chính**: liên kết bản cục bộ, nguồn gốc, lỗi/nhu cầu, thay đổi đã
+  làm, bằng chứng kiểm chứng và giới hạn, cùng đề xuất sửa nguồn dùng chung
+  cụ thể để người dùng xem xét. Phân biệt rõ bản cục bộ đã áp dụng với đề
+  xuất chưa áp dụng; không tự đưa thay đổi trở lại project chính. Nếu không
+  có điều chỉnh công cụ, ghi rõ không phát sinh.
+- Yêu cầu sửa/bảo trì project chính do người dùng giao riêng là phạm vi
+  khác; chỉ thực hiện khi có chỉ thị rõ, không suy từ việc cần hoàn tất phim.
+
 ## preview.html — mở được và xem được
 
 - Nằm ở root; dùng source bên trong, ví dụ iframe `project/index.html` và
@@ -68,6 +94,8 @@ Bắt buộc có:
    ba ý tưởng, lựa chọn/lý do, prompt và provider thực tế theo quy tắc Toán.
 5. **Tái dựng và nguồn:** liên kết source, treatment, credits/license, lệnh
    build/mix/mux đúng với vị trí mới; liên kết preview, MP4, cover, lịch và qa.html.
+6. **Điều chỉnh công cụ và đề xuất cho project chính:** theo mục script ở
+   trên; giữ lịch sử bản kế thừa và đề xuất để người dùng xem xét.
 
 Lưu nhật ký máy đọc được ở project/logs/ (ví dụ work.jsonl) để dựng lại trang.
 Với phim cũ thiếu log, chỉ ghi lịch sử truy được từ bằng chứng và đánh dấu

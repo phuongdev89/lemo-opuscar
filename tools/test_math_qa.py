@@ -10,6 +10,37 @@ import math_qa as qa
 
 
 class MathQATest(unittest.TestCase):
+    def test_style_consultation_needs_no_images_or_narration(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in ('problem.md', 'style.md', 'proposal.md'):
+                (root / name).write_text(name, encoding='utf-8')
+            manifest = {'mode': 'guided', 'grade': '5', 'problem': 'problem.md',
+                        'style': 'style.md', 'proposal': 'proposal.md'}
+            path = root / 'qa-input-style.json'
+            path.write_text(json.dumps(manifest))
+            content, hashes = qa.prepare(path, 'style')
+            context = json.loads(content[0]['text'])
+            self.assertEqual(len(content), 1)
+            self.assertEqual(context['style_spec'], 'style.md')
+            self.assertEqual(context['image_ids'], [])
+            self.assertIn('proposal.md', hashes)
+            report = {'verdict': 'pass', 'coverage': 'plan only',
+                      'recommendation': 'reserve logo space', 'issues': [],
+                      'style_checks': [{'criterion': c, 'status': 'pass', 'evidence': 'proposal section'}
+                                       for c in qa.STYLE_CHECKS]}
+            qa.validate_report(report, [], 'style')
+            report['style_checks'][0]['status'] = 'fail'
+            with self.assertRaises(ValueError):
+                qa.validate_report(report, [], 'style')
+            report['style_checks'].pop()
+            with self.assertRaises(ValueError):
+                qa.validate_report(report, [], 'style')
+            manifest['images'] = [{'path': 'not-created.png'}]
+            path.write_text(json.dumps(manifest))
+            with self.assertRaisesRegex(ValueError, 'text-only'):
+                qa.prepare(path, 'style')
+
     def test_disabled_never_reads_inputs_or_calls_api(self):
         for flag in ('', 'false', '1', 'yes'):
             with patch.object(qa, 'load_config', return_value={'AI_QA_REQUIRED': flag}), \
