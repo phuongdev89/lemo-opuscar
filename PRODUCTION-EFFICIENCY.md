@@ -48,7 +48,7 @@
 - Không gửi lại toàn bộ cảnh để kiểm cover. Cover dùng manifest và thư mục
   batch riêng, không ghi đè kết quả QA video. Tránh yêu cầu AI sinh lưới đếm,
   sơ đồ hoặc chữ toán chính xác khi có thể dùng hình học code-native của phim.
-- Chỉ render toàn bộ sau khi preview/nội dung đạt. Sau MP4 chỉ kiểm logo;
+- Chỉ render toàn bộ sau khi preview/nội dung đạt. Sau MP4 kiểm logo và độ sạch bản giao toàn khung;
   sửa logo thì mux từ video sạch. Thay nội dung mới quay về assets phần liên quan.
 - Mỗi lượt QA giữ request/response/result riêng, kể cả fail/error. Snapshot
   mới không thay lịch sử. Pass cũ hết giá trị với đầu vào đã thay đổi; không

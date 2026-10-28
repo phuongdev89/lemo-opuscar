@@ -75,10 +75,11 @@ Agent áp dụng ba cổng bằng `tools/math_qa.py`, không lặp QA nội dung
    Kiểm tra toán học, số/nhãn, minh họa, độ đọc được, tràn/chồng chữ, style,
    mức độ giải thích và lộ đáp án. Kiểm tra âm thanh/nhịp đọc từ WAV trước
    render, không chờ MP4. Sửa và duyệt xong mới render toàn bộ video.
-   Mỗi ảnh phải có riêng năm kiểm tra: `logo_overlap`, `readability`,
+   Mỗi ảnh phải có riêng sáu kiểm tra: `logo_overlap`, `readability`,
    `glyph_integrity` (dấu tiếng Việt, glyph thiếu/lỗi hoặc thay thế),
    `font_consistency` (trộn nét/font ngoài chủ đích trong cùng từ/vai trò chữ),
-   `text_overlap` (chữ chạm/chồng chữ, hình, chấm, nét hoặc bị cắt mép).
+   `text_overlap` (chữ chạm/chồng chữ, hình, chấm, nét hoặc bị cắt mép),
+   `delivery_cleanliness` (không lộ chữ/lớp debug, placeholder, ghi chú sản xuất).
    “Vẫn đọc được” không đủ để PASS khi còn các lỗi này. Khác font có chủ đích
    giữa tiêu đề, nhãn và công thức không tự động là lỗi. Gửi cả khung đầy đủ
    và crop nguyên độ phân giải cho vùng chữ nhỏ/cảnh đáp án; crop không thay
@@ -86,11 +87,11 @@ Agent áp dụng ba cổng bằng `tools/math_qa.py`, không lặp QA nội dung
    Agent tự xem ảnh và giải quyết lỗi nhìn thấy dù model báo PASS. Sau QA,
    thay đổi nguồn/nội dung làm hết hiệu lực nghiệm thu phần liên quan;
    không ghi PASS cố định trong script báo cáo.
-2. **`final` — sau MP4 chỉ kiểm tra vị trí logo kênh.** Công cụ tự trích
+2. **`final` — sau MP4 kiểm tra vị trí logo và độ sạch bản giao trên toàn khung.** Công cụ tự trích
    khung hình từ MP4 sau mux theo timestamp của từng bố cục, gửi ảnh và ID/
    timestamp với prompt ngắn riêng. Không đọc/gửi lại đề, lời giải, lời thoại,
-   không yêu cầu giải lại toán hay QA lại bố cục ngoài vùng ảnh hưởng logo.
-   Kiểm tra logo hiện đủ, nằm trong khung và không che nội dung. Sửa logo
+   không yêu cầu giải lại toán; kiểm toàn khung để phát hiện nội dung nội bộ bị lọt.
+   Kiểm tra logo hiện đủ, nằm trong khung, không che nội dung và không lộ debug/placeholder. Sửa logo
    chỉ chạy lại cổng này; sửa nội dung quay lại QA assets phần bị thay đổi.
 
 Manifest `qa-input-style.json` không cần ảnh, lời thoại hay audio. Sao chép
@@ -154,7 +155,7 @@ python tools/math_qa.py --manifest films/<phim>/project/qa-input-final.json --st
 ```
 
 Báo cáo `qa-assets.json` / `qa-final.json` ghi cạnh manifest, có `scope` lần
-lượt `content-and-layout` / `logo-only`. Mỗi batch (tối đa 40 ảnh) đặt trong
+lượt `content-and-layout` / `logo-and-delivery-cleanliness`. Mỗi batch (tối đa 40 ảnh) đặt trong
 thư mục riêng và giữ nguồn cần thiết trong thư mục đó, không ghi đè báo cáo
 batch khác; tất cả phải đạt. Không tự bỏ ảnh để giảm token. Chỉ gửi ảnh đại
 diện cho từng bố cục/thay đổi có ý nghĩa, không gửi lặp frame giống hệt nhau.
@@ -170,7 +171,7 @@ không gọi API. Đây là cổng do agent thực hiện; render/mux riêng kh�
 - Logo che bất kỳ chữ nào là **blocker**, kể cả tên kênh/badge/header; áp
   dụng cả số, đơn vị, nhãn điểm, sơ đồ và vật thể đang dùng để giảng. Không
   đoán chữ sau logo rồi coi là đọc được; logo không được lấn vùng bài giảng.
-- Mỗi ảnh final phải có `image_checks` đúng ID và mục `logo_overlap` chứa
+- Mỗi ảnh final phải có `image_checks` đúng ID và hai mục `logo_overlap`, `delivery_cleanliness` chứa
   status/evidence cụ thể về vị trí và nội dung lân cận. Logo thiếu, cắt mép,
   che nội dung hoặc không phán đoán được đều không đạt. Final không yêu cầu
   `independent_solution` hay `readability` cho toàn khung.
@@ -454,6 +455,19 @@ sẵn sàng copy-paste khi đăng. Mọi câu chữ bám **nội dung thật** c
 
 ## Đăng ký vào lịch đăng (`calendar.json`)
 
+**Đây là hợp đồng tích hợp với app lịch, không phải file đánh dấu hoàn tất.**
+Không tự tạo schema rút gọn. Trước bàn giao phải kiểm đủ trường theo mẫu bên
+dưới, không còn placeholder; `koc`, `youtube_title`, `youtube_description`,
+`facebook_caption` phải có nội dung thực lấy từ `upload.md`. Không dùng
+`channel`, `video_file`, `cover_file` thay cho `koc`, `video_meta.path`,
+`cover_path`: app không coi chúng là các trường tương đương.
+Kiểm `video_meta.path` và `cover_path` trỏ tới file tồn tại trong thư mục phim,
+đối chiếu metadata với ffprobe của MP4 cuối sau lần mux gần nhất. Thiếu hoặc
+sai bất kỳ mục nào là chưa hoàn tất bàn giao, dù JSON parse được. Ghi kết quả
+kiểm và phạm vi trong report; chỉ kiểm file không được tuyên bố đã import hay
+hiển thị thành công trên app. Không tự đổi ngày đăng hoặc ghi trạng thái đã
+đăng thật khi sửa metadata. Giữ bản sao trước khi sửa calendar đã tồn tại.
+
 Bước cuối, sau cover và `upload.md`: ghi `calendar.json` **ngay trong thư mục
 phim**, cạnh file `.mp4` và `cover.png` — không tạo thư mục riêng, không copy
 file đi đâu. Thư mục phim nằm trong `<OUTPUT_DIR>/`, nên:
@@ -466,7 +480,22 @@ file đi đâu. Thư mục phim nằm trong `<OUTPUT_DIR>/`, nên:
   một sản phẩm bàn giao: chuyển thư mục phim vào cây calendar sau bao lâu thì
   lịch tự có ngay.
 
-`calendar.json` ghi đúng mẫu sau (bám mẫu thật của app; nhóm trường quảng
+**Mẫu bắt buộc để sao chép:** [`docs/templates/calendar.json`](docs/templates/calendar.json).
+Agent phải đọc và sao chép tệp này vào `<film>/calendar.json`, rồi điền dữ liệu
+thật; không tự nhớ schema, viết bản rút gọn hoặc chép từ một phim khác.
+Nếu calendar đã tồn tại, sao lưu trong `project/` và bổ sung theo mẫu, giữ nguyên
+ngày đăng, trạng thái và dữ liệu xuất bản thật đã có. Không ghi đè mù bằng mẫu.
+
+Sau khi điền, bắt buộc kiểm:
+- Có đủ toàn bộ khóa và kiểu dữ liệu của mẫu, kể cả các khóa trong `video_meta`;
+  giữ các nhóm sản phẩm/quảng cáo mặc định nếu không dùng.
+- Không còn chuỗi placeholder `<...>`; nội dung đăng bài không được trống.
+- Tất cả thông số `video_meta` được đo từ MP4 cuối, không giữ số mẫu 0/24/1920/1080.
+- Đường dẫn video/cover tương đối theo thư mục phim, nằm trong thư mục đó và tồn tại.
+- Ghi bằng UTF-8 không BOM để app đọc bằng `encoding="utf-8"` được.
+
+Tệp mẫu là nguồn chuẩn; ví dụ dưới đây phải đồng bộ với tệp mẫu khi thay đổi
+hợp đồng. `calendar.json` ghi đúng mẫu sau (bám mẫu thật của app; nhóm trường quảng
 cáo/sản phẩm giữ trống nguyên), với đường dẫn trỏ tới file thật trong thư mục
 phim:
 
@@ -554,3 +583,9 @@ phim:
 
 Nguồn sư phạm: [`docs/math/math-pedagogy-rules.md`](docs/math/math-pedagogy-rules.md)
 và các tài liệu gốc trong `docs/math/references/`.
+
+### Không để lộ nội dung sản xuất trong bản giao
+
+- Vùng logo lưu bằng tọa độ/metadata; lớp debug mặc định tắt và tắt khi xuất ảnh QA hoặc MP4. Không vẽ chữ “VÙNG LOGO AN TOÀN” vào hình giao.
+- Assets và final bắt buộc kiểm `delivery_cleanliness` riêng từng ảnh: chữ debug, placeholder, khung safe-zone/căn chỉnh và ghi chú sản xuất xuất hiện là **blocker**, dù không chồng lấn. Không coi chúng là nội dung bài học cần bảo vệ khỏi logo. Phân biệt với nhãn và đường phụ có ý nghĩa sư phạm.
+- Final dùng ảnh trích MP4 thật. Chỉ PASS logo không đủ qua cổng; cả logo và độ sạch phải PASS. Báo đúng phạm vi ảnh/timestamp, không tuyên bố toàn phim đã sạch từ mẫu ảnh hạn chế.

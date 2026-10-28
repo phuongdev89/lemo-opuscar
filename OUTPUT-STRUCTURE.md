@@ -33,6 +33,8 @@ Ngoài cùng chỉ có đúng sáu tệp sau, cộng thư mục con phục vụ 
 - Cấu trúc bên trong tự chọn theo công cụ; `project/` là mặc định. Không xóa
   bằng chứng QA, lịch sử hoặc nguồn cần tái dựng chỉ để thư mục trông gọn.
 - `calendar.json` ở root, đường dẫn video/cover trỏ đúng các file root thực tế.
+- Bắt đầu bằng cách đọc và sao chép [docs/templates/calendar.json](docs/templates/calendar.json), không tự viết schema rút gọn hoặc lấy từ phim khác. Điền theo mục đăng ký lịch trong MATH-VIDEOS.md; kiểm đủ khóa/kiểu dữ liệu, hết placeholder, có nội dung đăng thật, metadata MP4 đã đo và đường dẫn tồn tại; lưu UTF-8 không BOM. Với file đã có, bảo toàn dữ liệu lịch/xuất bản thật thay vì ghi đè mặc định mẫu.
+- Calendar phải theo schema tích hợp trong MATH-VIDEOS.md (phim Toán), có nội dung đăng bài thật và metadata MP4 đo sau mux cuối; JSON hợp lệ hoặc file tồn tại chưa đủ nghiệm thu. Không thay `koc`/`video_meta.path`/`cover_path` bằng `channel`/`video_file`/`cover_file`. Ghi rõ kiểm file hay đã xác minh trên app.
   Nội dung đăng lấy từ `project/upload.md`, đồng thời trình bày trong report.html.
 - Các file phụ đề, poster, giấy phép và tài liệu nguồn của phim thường đặt
   trong project/ và liên kết từ report. Video Toán vẫn không tạo phụ đề.
@@ -158,7 +160,7 @@ AI**, không trình bày như đã đạt QA. Chỉ ghi các kiểm tra thủ c�
    root preview/report/qa sớm và cập nhật trong suốt quá trình.
 2. QA nội dung và ảnh cảnh thực tế **trước render MP4**; Toán theo MATH-VIDEOS.md.
 3. Build/mix ghi trung gian vào project/. Mux xuất duy nhất MP4 cuối ở root.
-4. Sau MP4, AI chỉ kiểm tra vị trí/logo che nội dung, không gửi lại đề/lời giải/
+4. Sau MP4, AI kiểm tra vị trí/logo che nội dung và độ sạch bản giao toàn khung, không gửi lại đề/lời giải/
    narration để QA lại bài. Cover kiểm tra riêng, không lặp ảnh cảnh đã duyệt.
 5. Hoàn thiện cover, lịch, tổng kết và lịch sử QA. Kiểm tra root chỉ có sáu file
    cho phép; tất cả liên kết HTML, ảnh/audio/video và đường dẫn calendar hợp lệ.
