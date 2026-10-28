@@ -18,6 +18,8 @@ This repository is a library of film styles. Each style has a `styles/<slug>/STY
 
 **Math films:** follow `MATH-VIDEOS.md`: fixed Minh Quân Pro voice, slow and thorough explanations, no background music or sound effects, no narration captions. These requirements override defaults in STYLE.md as well as demos. Preserve the user's selected style; audio and caption settings are independently configurable. Avoid white-paper/whiteboard layouts by default; follow an explicit user choice and assess the actual visuals rather than rejecting a style by name.
 
+**QA for every film:** Read [FILM-QA.md](FILM-QA.md). For all film types, merge environment → `.env` per key; only math films overlay `.env.math` last. When the effective `AI_QA_REQUIRED=true`, style consultation, assets QA and final QA are mandatory before delivery. Use `tools/film_qa.py` for general films and `tools/film_qa.py --film-type math` (or `tools/math_qa.py`) for math. Missing configuration, failed QA or insufficient evidence blocks production at the relevant gate. Never silently skip enabled QA.
+
 **Early math style consultation:** when `AI_QA_REQUIRED=true`, consult QA as soon as proposing/selecting a style, before finalizing the visual direction or producing images, TTS or animation. Use `tools/math_qa.py --stage style` with the original problem, grade/mode, full style specification and concrete design proposal. Resolve blocker/fix feedback before production and retain actual exchanges and agent decisions in qa.html. Planning approval does not replace later assets QA or final logo and delivery-cleanliness QA. See `MATH-VIDEOS.md`.
 
 ## Start
@@ -81,10 +83,11 @@ All 59 styles · 全部风格:
 
    Skip what their request already answers. Wait for the reply, fill every other gap with a sensible default, sum up the brief in a few lines and start. Don't come back with more questions.
 2. **Treatment.** Write `project/TREATMENT.md` in the film folder (DIRECTOR.md §4), before you open the demo (an Edit & Documentary style gathers its material first: **Treatment first** above).
-3. **Look.** Render style frames or a model sheet with the real drawing code and check them against `STYLE.md` (DIRECTOR.md §5).
-4. **Storyboard, only if the user asked for it** (DIRECTOR.md §5). **Stop and wait for approval.** Otherwise don't stop.
-5. **Produce.** Voice → check → score (can run in parallel) → animation → mix → render (TECHNIQUE.md).
-6. **Self-check and deliver** (DIRECTOR.md §11).
+3. **QA gates.** Follow FILM-QA.md: if enabled, pass style QA before images/TTS/animation, assets QA before full render, and final QA on the muxed MP4 before delivery. Retain actual exchanges in qa.html.
+4. **Look.** Render style frames or a model sheet with the real drawing code and check them against `STYLE.md` (DIRECTOR.md §5).
+5. **Storyboard, only if the user asked for it** (DIRECTOR.md §5). **Stop and wait for approval.** Otherwise don't stop.
+6. **Produce.** Voice → check → score (can run in parallel) → animation → mix → render (TECHNIQUE.md).
+7. **Self-check and deliver** (DIRECTOR.md §11).
 
 Report progress in the user's language. If a step fails, read the error, fix the cause and retry; go back to the user only for a decision or something only they can provide.
 
@@ -113,7 +116,7 @@ Report progress in the user's language. If a step fails, read the error, fix the
 - tools/film_image.py implements API → Muse for new images only. The agent must handle the built-in tier first and supply --builtin-unavailable with a verified reason. Use the skills directly for reference images or editing.
 - --dry-run makes no network calls and reports configuration issues. --cover normalizes output to PNG at 1280x720 under 2 MB. Inspect the actual image before accepting it.
 - Keep code-native style artwork when required by STYLE.md.
-- Shared project settings belong in .env. For math films, read MATH-VIDEOS.md; .env.math contains OUTPUT_DIR and optional AI_QA_* overrides. Follow MATH-VIDEOS.md for conditional vision QA; only AI_QA_REQUIRED=true enables it. Pass output paths explicitly to core tools that do not load .env.math.
+- Shared project settings belong in .env. For math films, read MATH-VIDEOS.md; .env.math contains OUTPUT_DIR and optional AI_QA_* overrides. Follow FILM-QA.md for conditional vision QA on every film and MATH-VIDEOS.md for math-specific checks; only effective AI_QA_REQUIRED=true enables it. Pass output paths explicitly to core tools that do not load .env.math.
 - tools/math_cover.py is a compatibility entry point with --cover and the same built-in prerequisite.
 
 **Delivery cleanliness:** Keep logo safe zones as invisible coordinates/metadata. Debug overlays default off and must be off in QA previews and exports. Visible production labels, placeholders or alignment guides are blockers in assets and final QA, even without overlap. Final QA checks both logo placement and full-frame delivery cleanliness on actual MP4 frames; report only the scope actually inspected.

@@ -32,6 +32,8 @@ tham chiếu bằng hash), response nhận được, manifest và result; JSON c
 manifest chỉ là snapshot mới nhất. Agent bổ sung lịch sử sửa, liên kết ảnh
 và dựng hai trang báo cáo theo hợp đồng; không coi snapshot là lịch sử đủ.
 
+QA áp dụng cho mọi loại phim theo [FILM-QA.md](FILM-QA.md); các yêu cầu dưới đây bổ sung riêng cho phim toán. Có thể dùng `tools/film_qa.py --film-type math` thay cho `tools/math_qa.py`, với cùng manifest và `.env.math` nạp cuối.
+
 ## Cấu hình riêng cho video toán
 
 Cấu hình dịch vụ dùng chung nằm trong `.env` tại root repository. `.env.math`

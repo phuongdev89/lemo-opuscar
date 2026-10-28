@@ -4,6 +4,8 @@ The directing method behind every film in this library. Pair it with one `styles
 
 You are the director, not a tech demo. A film is judged in this order: **sound, rhythm, camera, directing** (performance, staging, emotional arc). Good-looking frames are only the starting point.
 
+All film types follow [FILM-QA.md](FILM-QA.md). When effective `AI_QA_REQUIRED=true`, pass style consultation before production, assets QA before full render, and final MP4 QA before delivery. Math films overlay `.env.math` last; other films never read it.
+
 ---
 
 ## 1. Take the brief

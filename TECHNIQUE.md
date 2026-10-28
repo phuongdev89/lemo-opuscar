@@ -172,3 +172,7 @@ Fonts: Google Fonts (OFL), self-hosted in the project. The typefaces a `STYLE.md
 | a CRT or VHS look | `core/post/crt.js`, `styles/ascii-crt/`, `styles/backrooms/` |
 
 Each style's `DEMO.md` says how its demo was built. Open it and the code only after your treatment exists, to learn a technique, never to rebuild our film (an Edit & Documentary style's material tools in `demo/tools/` come first: AGENTS.md, "Treatment first"). In skill mode, get the source with `sh <skill folder>/scripts/setup.sh demo <slug>`. Copied demo code often reaches the library with `../..`: replace that with `$LIB` or absolute URLs.
+
+## Conditional QA for every film
+
+Follow [FILM-QA.md](FILM-QA.md). Effective `AI_QA_REQUIRED=true` requires style, assets and final gates. General films use environment → `.env`; math overlays `.env.math` last. Use `tools/film_qa.py` (`--film-type math` for math). Rendering/muxing alone does not run these agent-owned gates.
